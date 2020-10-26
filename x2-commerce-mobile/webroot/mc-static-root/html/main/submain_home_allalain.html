@@ -1,0 +1,3937 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta name="format-detection" content="telephone=no">
+	<meta property="og:title" content="올리브영 모바일 메인"><!-- 사이트 명 -->
+	<meta property="og:url" content="http://"><!-- 사이트 URL -->
+	<meta property="og:image" content=""><!-- 대표 이미지 URL -->
+	<meta property="og:description" content=""><!-- 사이트 설명 -->
+	<meta http-equiv="X-Frame-Options" content="deny" />
+	<title>😡올알랭 가이드😡</title>
+	<link rel="stylesheet" href="/mc-static-root/css/global.css"/>
+	<link rel="stylesheet" href="/mc-static-root/css/common.css"/>
+	<link rel="stylesheet" href="/mc-static-root/css/board.css"/>
+	<link rel="stylesheet" href="/mc-static-root/css/contents.css"/>
+	<link rel="stylesheet" href="/mc-static-root/css/project/main.css"/>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/common.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/main/main.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/ixBand.min.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/ixSnack.min.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/swiper.min.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/content_ui.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/jquery.lazyload.js"></script>
+	<script type="text/javascript">
+	//<![CDATA[
+		$(function(){
+			//2020-06-29 메인개편 추가 스크립트
+
+			//MC Main GNB Swiper
+			/*
+			var gnbLi = $("#mGnb .gnb_cate li");
+			var mainSwiper = new Swiper('#mainSwiper', {
+				initialSlide: 0,
+				loop: true,
+				autoHeight: true,
+				observer: true,
+				observerParents: true,
+				touchAngle: 30,		//default 45deg
+				onInit(swiper) {
+					//GNB 탭 활성화
+					gnbLi.eq(0).addClass("on");
+				},
+				onSlideChangeStart(swiper) {
+					//슬라이드 시작 시
+				},
+				onSlideChangeEnd(swiper) {
+					//페이지 스크롤 0으로.
+					$(window).scrollTop(0);
+					//GNB 탭 활성 전환
+					gnbLi.filter(".on").removeClass("on");
+					var idx = swiper.realIndex;
+					gnbLi.eq(idx).addClass("on");
+				}
+			});
+
+			//GNB 클릭 시 스와이프 전환
+			gnbLi.children("a").on("click touch", function(e){
+				e.preventDefault();
+				if ( !$(this).hasClass("on") ) {
+					var idx = $(this).parent(gnbLi).index() + 1;
+					mainSwiper.slideTo(idx);
+				};
+			})
+			*/
+
+			//Quick-Menu Swiper
+			var qmSwiper = {
+				initialSlide: 0,
+				slidesPerView: "auto",
+				observer: true,
+				observerParents: true,
+				freeMode: true,
+				touchAngle: 30,		//default 45deg
+				spaceBetween: 14,	// when window width is > 410px 
+				breakpoints: {
+					// when window width is <= 410px (320px ~ 410px -> 8px, 411px ~ 14px)
+					410: {
+						spaceBetween: 8
+					}
+				},
+				onInit(swiper) {
+					//이벤트 삭제
+				},
+				onSetTranslate(swiper, translate) {
+					//2020-07-09 보류
+					// const Qreachend = swiper.width - $(swiper.slides[0]).outerWidth(true) * (swiper.slides.length - 1) - $(".quick-menu .show-drawer").width(),
+					// 	Qgap = 80,
+					// 	Qgoal = Qreachend - Qgap,
+					// 	Qmore = $(".quick-menu .show-drawer button>span"),
+					// 	Qdiff = parseInt(Qreachend - translate);
+					// $(".mAllSearch").text(translate);
+					// console.log("Qreachend:" + Qreachend + ", Qgoal:" + Qgoal + ", Qdiff:" + Qdiff);
+					// if ( Qreachend < 0 && translate < Qreachend ) {
+					// 	Qmore.css({"transform":"translateX(" + (Qdiff / 10) + "px)"})
+					// 	if ( swiper.width < $(window).width() && translate < Qgoal ) showDrawer();
+					// } else {
+					// 	Qmore.attr("style", "");
+					// };
+				}
+			};
+			//quick-menu 항목이 5개보다 많을 때
+			var quickmenuOrigin = $(".quick-menu:eq(0)"),
+				quickmenu = $(".quick-menu");
+			if ( quickmenuOrigin.find(".swiper-slide").length > 5 ) {
+				quickmenu.removeClass("flex-quick-menu");
+				quickmenu.find(".show-drawer").show();
+				quickmenuswiper = Swiper('.quick-menu', qmSwiper);
+			};
+			//당겨서 드로어 메뉴 보여주기
+			function showDrawer(){
+				var drawer = $("#allMenu");
+				if ( !drawer.hasClass("ready") ) {
+					drawer.addClass("ready").stop().animate({opacity: 1}, 10, function(){
+						$("body").css("overflow", "hidden");
+						$(this).addClass("visible").find(".btn-drawer-closer").removeClass("allmenuClose").on("click touch", function(e){
+							e.preventDefault();
+							$(this).addClass("allmenuClose");
+							drawer.removeClass("visible").stop().animate({opacity: 1}, 300, function(){
+								$("body").css("overflow", "visible");
+								drawer.removeClass("ready");
+							});
+						});
+					});
+				};
+			};
+			//더 보기 버튼 눌렀을 때
+			$(".show-drawer button").on("click touch", function(){
+				$("#footerTabCategoy").trigger("click");
+			});
+
+			//상단 sub gnb 들
+			$(".mSubGnb").each(function(index, element){
+				var $this = $(this);
+				$this.addClass('sub-gnb' + index);
+				var swiper = new Swiper('.sub-gnb' + index, {
+					initialSlide: 0,
+					slidesPerView: 'auto',
+					paginationClickable: true,
+					spaceBetween: 0,
+					loop: false
+				});
+			});
+
+			//탭 show/hide
+			var jdTab = function(elem) {
+				var tc = elem.siblings(".tab_contents"),
+					tl = elem.find("li"),
+					ta = tl.find("a"),
+					mainS = $("#mainSwiper>.swiper-wrapper"),
+					init = 0;
+				function tabAction(i){
+					tc.not(":eq("+i+")").hide();
+					tc.eq(i).show();
+					tl.eq(i).addClass("on").siblings(".on").removeClass("on");
+				};
+				tabAction(init);
+				ta.on("click touch", function(){
+					if ( ! $(this).parent(tl).hasClass("on") ) {
+						var pi = $(this).parent().index();
+						tabAction(pi);
+						mainSwiper.update();
+					};
+				});
+			};
+			$(".mFixTab").each(function(){
+				jdTab($(this));
+			});
+
+			//베스트 > 리뷰베스트 swipe
+			var review_best = {
+				autoplay: false,
+				freeMode: false,
+				slidesPerView: 'auto',
+				spaceBetween: 0,
+				observer: true,
+				observerParents: true,
+				onInit(swiper){
+					//target이 :hidden일 때, 해당 탭 터치 시 swiper.update() 실행 (:hidden 상태에선 width값이 없어서 영역을 비정상적으로 설정함)
+					if ( $(".review_best_slide").is(":hidden") ) {
+						$(".btn-review-best").on("click touch", function(){
+							review_swiper.update();
+						});
+					}
+				}
+			}, review_swiper = Swiper('.review_best_slide', review_best );
+		});
+	</script>
+	<script type="text/javascript">
+	//<![CDATA[
+		$(function(){
+
+			var mGnb_init_no = $('#mGnb').find('li.on').index();
+			if(mGnb_init_no < 0) mGnb_init_no = 0;
+
+			//메인 슬라이드 S
+			var mVisual = $('.mVisual-slide'),
+				ixItems = mVisual.find('.ix-list-items'),
+				ixItem = mVisual.find('.ix-list-item'),
+				ixItemLen = ixItem.length-1,
+				pagination = mVisual.find('.ix-controller .idx');			//2020-08-26 추가
+
+			ixItem.eq(0).addClass('st');
+			mVisual.ixOverlayList();
+			mVisual.find('li[data-idx='+ixItemLen+']').addClass('prev');
+			pagination.text("1");											//2020-08-26 추가
+			mVisual.find('.ix-controller .length').text(ixItem.length);		//2020-08-26 추가
+			mVisual.on('ixOverlayList:slideStart', function(e){
+				var index = e.currentIndex,
+					direction = e.direction;
+				if(direction == 'next'){
+					var index = index<ixItemLen ? index = index + 1 : index = 0;
+				}else{
+					var index = index<=0 ? index = ixItemLen : index = index - 1;
+				}
+				ixItems.find('li[data-idx='+index+']').addClass('on');
+			});
+			mVisual.on('ixOverlayList:slideEnd', function(e){
+				var index = e.currentIndex,
+					direction = e.direction;
+				if(direction == 'next'){
+					var index = index<=0 ? index = ixItemLen : index = index - 1;
+				}else{
+					var index = index>=ixItemLen ? index = 0 : index = index + 1;
+				}
+				ixItems.find('li[data-idx='+index+']').removeClass('on');
+
+				var addprev = e.currentIndex;
+				var addprev = addprev<=0 ? addprev = ixItemLen : addprev = addprev - 1;
+				ixItems.find('li[data-idx='+addprev+']').addClass('prev');
+
+				var remprev = e.currentIndex;
+				var remprev = remprev>=ixItemLen ? remprev = 0 : remprev = remprev + 1;
+				ixItems.find('li[data-idx='+remprev+']').removeClass('prev');
+				pagination.text(e.currentIndex + 1);						//2020-08-26 추가
+				//초기 st 삭제
+				ixItem.removeClass('st');
+			})
+			// 2020-08-26 재생/일시중지 버튼 삭제
+			/*
+			mVisual.find('.btnPlay').on('click', function(){
+				if(!$(this).hasClass('pause')){
+  		   			$(this).addClass('pause');
+  		   			mVisual.ixOverlayList('startTimer');
+  			   	}else{
+		   			$(this).removeClass('pause');
+		   			mVisual.ixOverlayList('stopTimer');
+  				}
+			});
+			*/
+			$(window).on( 'resize', function(e) {
+				mVisual.ixOverlayList('resize');
+			});
+			//메인 슬라이드 E
+
+			//메인일경우 footer padding 변경
+			if(mVisual.length > 0){
+				$('#mFooter').css('padding-top', 0);
+			}
+
+	  		/* 상단 띠배너 S */
+			//2020-08-04 삭제
+	  		/* 상단 띠배너 E */
+
+
+			/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+			//검색 레이어 닫힌 후 동작 예시 2017-01-18
+			$('.mAllSearch a').click(function(){
+				$('#mWrapper').hide();
+				$('#mSearchWrapper').show();
+				banner_swiper.destroy(); //필수
+			})
+			$('#mSearchWrapper button').click(function(){
+				$('#mWrapper').show();
+				visual_swiper = Swiper('#mHome-visual', visual_set ); //필수
+				$('#mSearchWrapper').hide()
+			})
+			/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+
+			//카테고리 BEST 플리킹
+			var mSubGnb_swiper = new Swiper('#mSub1s-menu', {
+				initialSlide: 0,
+				slidesPerView: 'auto',
+				paginationClickable: true,
+				spaceBetween: 0,
+				loop: false
+			});
+
+			//인기 브랜드 플리킹
+			var mSubGnb_swiper = new Swiper('#mSub2s-menu', {
+				initialSlide: 0,
+				slidesPerView: 'auto',
+				paginationClickable: true,
+				spaceBetween: 0,
+				loop: false
+			});
+
+			//카드할인 배너 2018-10-01
+			var mCardBanner = new Swiper('#cardSlide', {
+				initialSlide: 0,
+				slidesPerView: 1,
+				paginationClickable: true,
+				autoplay: false,
+				pagination: '.paging',
+				loop: false
+			});
+
+			//브랜드 배너 플리킹 2017-01-18 수정
+			var banner_set = {
+				slidesPerView: 1,
+				paginationClickable: true,
+				spaceBetween: 30,
+				nextButton: '.next',
+				prevButton: '.prev',
+				freeMode: false,
+				loop: true
+			}, banner_swiper = Swiper('#mHome-onlyone', banner_set );
+
+			//앱다운로드 배너 추가건
+			$(".hd_banner_close").click(function(){
+				$('#webBanner').css('display','none');
+				//$('#mHome-visual').css({'padding-top':'0'}); 기존 슬라이드 간격에서 부모 간격으로 변경
+				$('#mContents').css({'padding-top':'0'});
+			});
+			if($('#webBanner').css("display") == 'block'){
+				$('#mContents').css({'padding-top':'48px'});
+			}else{
+				if($('#webBanner').css("display") == 'none'){
+					$('#mContents').css({'padding-top':'0'});
+				}
+			}
+		});
+
+
+
+		//메인 비쥬얼 인디게이터
+		function pagingLoad(){
+			var _bulStop = $('.mHome-visual .control_box'),
+				_bulDot = $('.mHome-visual .control_box .paging span'),
+				_bulDotWt = (100/(_bulDot.length))+'%';
+
+			_bulDot.css('width', _bulDotWt)
+		}
+
+		//layer 팝업
+		function popLayerOpen (IdName){	
+			var winH = $(window).height()-100; //수정함
+			var popLayer = ('#'+IdName);		  
+			/* var winH = $(window).height()/2;
+			var popLayer = $(".popLayerWrap"); */
+			 $(popLayer).find('.popCont').css({'max-height': winH});
+
+			var popPos = $(popLayer).height()/2;
+			var popWid = $(popLayer).width()/2;
+			//$(popLayer).css({'left':'50%' , 'margin-left':-(popWid) , 'top':'50%' , 'margin-top':-(popPos)}).show().parents('body').css({'overflow' : 'hidden'});
+			$(popLayer).css({'left':'50%' , 'margin-left':-(popWid) , 'top':'50%' , 'margin-top':-(popPos)}).show().parents('body').css({'overflow' : 'hidden'});
+			$('.dim').show();
+
+			$('.dim').bind('click', function(){
+				popLayerClose(IdName);
+			});
+
+			$(window).resize(function(){
+				winH = $(window).height()/2;
+			   $(popLayer).find('.popCont').css({'max-height': winH});
+				popPos =$(popLayer).height()/2;
+				popWid = $(popLayer).width()/2;
+				$(popLayer).css({'left':'50%' , 'margin-left':-(popWid) , 'top':'50%' , 'margin-top':-(popPos)})
+			});
+
+		};
+
+		function popLayerClose (){
+			var popLayer = $(".popLayerWrap");
+			var mHeader = $('#mHeader');
+			//$(popLayer).hide().parents('body').css({'overflow-y' : 'auto'});
+			$(popLayer).hide().parents('body').removeAttr('style');
+			$('.dim').hide();
+		};
+	//]]>
+	</script>
+
+</head>
+<body id="main">
+<!-- #mWrapper -->
+<div id="mWrapper">
+	<!-- #mHeader -->
+	<div id="mHeader" class="ixHead mHome lci"><!-- ixHead : 메인 헤더 / subHead : 서브 헤더 클래스 구분 -->
+		<!-- 앱다운로드 배너 추가건 -->
+		<!-- <div class="header_banner" id="webBanner" style="display:block">
+			<div class="hd_banner_cont">앱 설치하면 <span class="point">5% 할인쿠폰</span> 드려요</div>
+			<a class="hd_banner_close">닫기</a>
+		</div> -->
+
+		<!-- 메인 헤더 영역 -->
+		<div id="mHgroup">
+			<h1><a href="#" class="logo">OLIVE YOUNG</a></h1>
+			<span class="mAllSearch app">
+				<a href="#none">본격 썬케어 시즌! 본격 썬케어 시즌2 ! 본격 썬케어 시즌2 ! 본격 썬케어 시즌2 ! 본격 썬케어 시즌2 ! 본격 썬케어 시즌2 !</a>
+				<button type="button" class="m_btn_sch">검색</button>
+				<button type="button" class="m_btn_barcode">바코드검색</button>
+			</span>
+			<span class="mBasket"><button type="button" class="basket">장바구니<span class="cnt">80</span></button></span>
+		</div>
+
+		<!-- 메인 GNB 영역 -->
+		<div id="mGnb">
+			<ul class="gnb_cate">
+				<li class="swiper-slide"><a href="submain_home.html"><span>홈</span></a></li>
+				<li class="swiper-slide"><a href="submain_hotdeal.html"><span>오특</span></a></li>
+				<li class="swiper-slide"><a href="submain_new.html"><span>신상</span></a></li>
+				<li class="swiper-slide"><a href="submain_best.html"><span>베스트</span></a></li>
+				<li class="swiper-slide"><a href="submain_plan.html"><span>기획전</span></a></li>
+				<li class="swiper-slide"><a href="submain_event.html"><span>이벤트</span></a></li>
+			</ul>
+		</div>
+		<!-- //메인 GNB 영역 -->
+
+	</div>
+	<!-- //#mHeader -->
+	<!-- #mContainer -->
+	<div id="mContainer" class="mMain lci">
+		<!-- #mContents -->
+		<div id="mContents">
+
+			<div id="mainSwiper" class="swiper-container">
+				<div class="swiper-wrapper">
+					<!-- ↓ 홈 -->
+					<div class="swiper-slide">
+
+						<!-- ↓ 2020-08-21 메인베너 변경 -->
+						<div class="mVisualArea">
+							<div class="mVisual-slide" data-ix-options="motion-type:slide;auto-play:false;delay:5000;duration:200;viewport-ratio:100 76;">
+								<div class="ix-list-viewport">
+									<ul class="ix-list-items">
+										<li class="ix-list-item">
+											<a href="#n">
+												<div class="thum"><img class="" src="http://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/180039369180675682.jpg"></div>
+												<div class="dec">
+													<p class="txt">
+														<span>닭닭닭닭 닭닭 닭닭닭 닭닭</span>
+														<br>
+														<span>ENGLISHISGOODLANGUAGE</span>
+													</p>
+													<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+												</div>
+											</a>
+										</li>
+										<li class="ix-list-item">
+											<a href="#n">
+												<div class="thum"><img class="" src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/6767022671105612523.jpg"></div>
+												<div class="dec">
+													<p class="txt">2나를 빛내줘~ 올리브영!<br>트윙클 할로윈</p>
+													<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+												</div>
+											</a>
+										</li>
+										<li class="ix-list-item">
+											<a href="#n">
+												<div class="thum"><img class="" src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/5981228611284235290.jpg"></div>
+												<div class="dec">
+													<p class="txt"><span>3나를 빛내줘~ 올리브영!</span><br><span>트윙클 할로윈</span></p>
+													<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+												</div>
+											</a>
+										</li>
+										<li class="ix-list-item">
+											<a href="#n">
+												<div class="thum"><img class="" src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/2837028763006609114.jpg"></div>
+												<div class="dec">
+													<p class="txt"><span>4나를 빛내줘~ 올리브영!</span><br><span>윙클 할로윈</span></p>
+													<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+												</div>
+											</a>
+										</li>
+									</ul>
+								</div>
+								<div class="ix-controller">
+									<span class="cnt">
+										<span class="idx"></span>
+										<span class="slash">/</span>
+										<span class="length"></span>
+									</span>
+									<button type="button" class="show-all-banner" title="배너 전체 보기">+</button>
+								</div>
+							</div>
+						</div>
+						<script>
+							$(function(){
+								//배너 전체보기 보이기
+								$("body").on("click touch", "button.show-all-banner", function(){
+									$("#show-all-banner").show().find(".sab-body").scrollTop(0);
+									$("body").addClass("visible-allmenu");
+								});
+								//배너 전체보기 감추기
+								$("body").on("click touch", "button.hide-all-banner", function(){
+									$("#show-all-banner").hide();
+									$("body").removeClass("visible-allmenu");
+								});
+							})
+						</script>
+						<!-- ↑ 메인베너 변경 -->
+
+						<!-- ↓ 2020-08-03 상단 띠배너 개편 -->
+						<div class="main-h-banner swiper-container">
+							<div class="swiper-wrapper">
+								<div class="swiper-slide">
+									<a href="#">
+										<span class="img-wrap"><img src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/138/99078672776859070.jpg" class="banner" alt="APP 첫구매 라운지"></span>
+									</a>
+									<span class="circle"></span>
+								</div>
+								<div class="swiper-slide">
+									<a href="#">
+										<span class="img-wrap"><img src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/138/7335698925932314250.jpg" class="banner" alt="다음 탑리뷰어 주인공은?"></span>
+									</a>
+									<span class="circle"></span>
+								</div>
+							</div>
+							<button type="button" class="btn-next">다음 배너 보기</button>
+							<button type="button" class="btn-prev">이전 배너 보기</button>
+							<div class="dummy d1"><div></div></div>
+							<div class="dummy d2"><div></div></div>
+						</div>
+						<script>
+							let mainHBanner = $(".main-h-banner");
+							let d1 = mainHBanner.find(".dummy.d1");
+							let d2 = mainHBanner.find(".dummy.d2");
+							let hbanner = new Swiper(mainHBanner, {
+								slidesPerView: 1,
+								spaceBetween: 0,
+								speed: 200,
+								longSwipesMs: 0,
+								longSwipesRatio: 0.3,
+								touchReleaseOnEdges: true,	//시작, 끝 지점에서 더 이상 당길 수 없다. 
+								nextButton: mainHBanner.find('.btn-next'),
+								prevButton: mainHBanner.find('.btn-prev'),
+								onInit(swiper) {
+									mainHBanner.addClass("ready init");
+									let bg1 = $(swiper.slides[0]).find("img").attr("src");
+									let bg2 = $(swiper.slides[1]).find("img").attr("src");
+									d1.css("background-image", "url("+bg1+")").children("div").css("background-image", "url("+bg2+")");
+									d2.css("background-image", "url("+bg2+")").children("div").css("background-image", "url("+bg1+")");
+									d2.addClass("active");
+								},
+								onSetTranslate(swiper, translate) {
+									let ww = $(window).width();
+									let blur, brightness;
+									if ( swiper.activeIndex == 0 ) {
+										blur = 0.5 - (-translate * 0.005);
+										if (blur < 0) blur = 0;
+										d2.css({filter: "blur("+ blur +"px)"})
+									} else {
+										blur = 0.5 - ((translate + ww) * 0.005);
+										if (blur < 0) blur = 0;
+										d1.css({filter: "blur("+ blur +"px)"})
+									};
+								},
+								onTouchStart(swiper, event)	{
+									mainHBanner.removeClass("init ready");
+									swiper.wrapper.removeClass("transition");
+								},
+								onTouchEnd(swiper, event)	{
+									mainHBanner.addClass("ready");
+									swiper.wrapper.addClass("transition");
+								},
+								onSlideChangeStart(swiper) {
+									mainHBanner.addClass("ready");
+									if ( swiper.activeIndex == 0 ) {
+										d2.addClass("active");
+										d1.removeClass("active");
+									} else {
+										d1.addClass("active");
+										d2.removeClass("active");
+									}
+								}
+							});
+						</script>
+						<!-- ↑ 상단 띠배너 개편 -->
+
+						<!-- ↓ 2020-08-21 오늘의 특가 -->
+						<div class="main-today">
+							<h2 class="home-stit-18">오늘의 특가</h2>
+							<div class="timer ready">
+								<span class="clock"></span>
+								<!-- <img src="/mc-static-root/image/main/icon_todays@2x.png" srcset="/mc-static-root/image/main/icon_todays@2x.png 2x, /mc-static-root/image/main/icon_todays@3x.png 3x" alt=""> -->
+								<span class="nums h">
+									<span class="num" data-timer-val="0">0</span>
+									<span class="num" data-timer-val="0">0</span>
+								</span>
+								<span class="nums m">
+									<span class="num" data-timer-val="0">0</span>
+									<span class="num" data-timer-val="0">0</span>
+								</span>
+								<span class="nums s">
+									<span class="num" data-timer-val="0">0</span>
+									<span class="num" data-timer-val="0">0</span>
+								</span>
+							</div>
+							<div id="today-curation" class="main-curation swiper-container">
+								<div class="prod-list v2 v2c swiper-wrapper">
+								
+									<!-- ↓ 상품 -->
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 -->
+											<div class="thumb-wrap">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge best">베스트</span>
+												</a>
+											</div>
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand"></div>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 버터플 야도랑 피존투 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+															<span class="oneday">오늘드림</span>
+														</div>
+														<div class="flags">
+															<span class="flag present">GIFT</span>
+															<span class="flag plus">1+1</span>
+															<span class="flag sale">세일</span>
+															<span class="flag coupon">쿠폰</span>
+															<span class="flag gift">증정</span>
+															<span class="flag free">무배</span>
+														</div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+									<!-- ↑ 상품 -->
+	
+									<!-- ↓ 상품 2 -->
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 / 성인인증 -->
+											<div class="thumb-wrap">
+												<a href="javascript:;" class="thumb goodsListLogin" data-ref-goodsno="A000000008456" data-ref-dispcatno="90000010001" data-ref-itemno="001">
+													<span class="minor"><em>성인인증</em> 후 구매가능</span>
+												</a>
+											</div>
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand"></div>
+													<div class="prod-func">
+														<button type="button" class="favorite active">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">스플래시 레인 오 드 뚜왈렛</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+														</div>
+														<div class="flags">
+															<span class="flag free">무배</span>
+															<span class="flag gift">증정</span>
+															<span class="flag present">GIFT</span>
+														</div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+									<!-- ↑ 상품 2 -->
+	
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 / 판매종료 -->
+											<div class="thumb-wrap">
+												<a href="javascript:;" class="thumb goodsList" data-ref-goodsno="A000000113275" data-ref-dispcatno="90000010001" data-ref-itemno="001">
+													<img data-original="https://image.oliveyoung.co.kr/uploads/images/goods/10/0000/0010/A00000010337901ko.jpg?l=ko" alt="[온라인단독] 리얼베리어 익스트림 크림 마스크 10매" class="pic-thumb completed-scroll-lazyload" onerror="common.errorImg(this);" src="https://image.oliveyoung.co.kr/uploads/images/goods/10/0000/0010/A00000010337901ko.jpg?l=ko">
+													<span class="allsoldOut">판매종료</span>
+												</a>
+											</div>
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand"></div>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+														</div>
+														<div class="flags">
+															<span class="flag present">GIFT</span>
+														</div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+	
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 / 일시품절 -->
+											<div class="thumb-wrap">
+												<a href="javascript:;" class="thumb goodsList" data-ref-goodsno="A000000113625" data-ref-dispcatno="90000010001" data-ref-itemno="001">
+													<img data-original="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0011/A00000011362502ko.jpg?l=ko" alt="[온라인단독] DHC 딥클렌징오일 200mlX2 더블기획" class="pic-thumb completed-scroll-lazyload" onerror="common.errorImg(this);" src="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0011/A00000011362502ko.jpg?l=ko">
+													<span class="soldOut">일시품절</span>
+													<span class="flag-badge best">베스트</span>
+												</a>
+											</div>
+												
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand"></div>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+															<span class="oneday">오늘드림</span>
+														</div>
+														<div class="flags"></div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+	
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 -->
+											<div class="thumb-wrap">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge best">베스트</span>
+												</a>
+											</div>
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand"></div>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+															<span class="oneday">오늘드림</span>
+														</div>
+														<div class="flags">
+															<span class="flag plus">1+1</span>
+														</div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+	
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 -->
+											<div class="thumb-wrap">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge best">베스트</span>
+												</a>
+											</div>
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand"></div>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+														</div>
+														<div class="flags">
+															<span class="flag free">무배</span>
+															<span class="flag gift">증정</span>
+															<span class="flag present">GIFT</span>
+														</div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+	
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 -->
+											<div class="thumb-wrap">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge best">베스트</span>
+												</a>
+											</div>
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand"></div>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+														</div>
+														<div class="flags">
+															<span class="flag free">무배</span>
+															<span class="flag gift">증정</span>
+															<span class="flag plus">1+1</span>
+														</div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+	
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 -->
+											<div class="thumb-wrap">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge best">베스트</span>
+												</a>
+											</div>
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand"></div>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+														</div>
+														<div class="flags">
+															<span class="flag free">무배</span>
+															<span class="flag present">GIFT</span>
+														</div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+	
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 -->
+											<div class="thumb-wrap">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge best">베스트</span>
+												</a>
+											</div>
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand">
+														<strong class="exclusive">EXCLUSIVE</strong>
+													</div>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+														</div>
+														<div class="flags">
+															<span class="flag gift">증정</span>
+															<span class="flag present">GIFT</span>
+														</div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+	
+									<div class="prod swiper-slide">
+										<div class="prod-inner">
+											<!-- ↓ 썸네일 -->
+											<div class="thumb-wrap">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge best">베스트</span>
+												</a>
+											</div>
+											<!-- ↑ 썸네일 -->
+	
+											<!-- ↓ 상품 정보 -->
+											<div class="prod-info-wrap">
+												<div class="prod-info">
+													<div class="brand"></div>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+													<a href="#">
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450원</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+															<span class="oneday">오늘드림</span>
+														</div>
+														<div class="flags">
+															<span class="flag free">무배</span>
+															<span class="flag gift">증정</span>
+															<span class="flag plus">1+1</span>
+															<span class="flag present">GIFT</span>
+														</div>
+													</a>
+												</div>
+											</div>
+											<!-- ↑ 상품 정보 -->
+	
+										</div>
+									</div>
+	
+								</div>
+								<div class="swiper-scrollbar"></div>
+								<a href="#" class="main-btn-max">오늘의 특가 상품 더보러 가기</a>
+								<!-- <button type="button" class="main-btn-max">오늘의 특가 상품 더보러 가기</button> -->
+							</div>
+						</div>
+						<script>
+						// swiper on!
+						var mSubGnb_swiper = new Swiper('#today-curation', {
+							slidesPerView: 'auto',
+							spaceBetween: 15,
+							loop: false,
+							scrollbar: '.swiper-scrollbar',
+							scrollbarHide: false,
+							freeMode: true,
+							freeModeMomentumRatio: 1,
+							freeModeMomentumVelocityRatio: 1
+						});
+						// 카운트다운 타이머
+						let tomorrow = new Date();
+						tomorrow.setDate(tomorrow.getDate() + 1);
+						tomorrow.setHours(0,0,0);
+						let x = setInterval(function() {
+							let now = new Date().getTime();
+							let distance = tomorrow - now;
+							let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+							let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+							let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+							function mm(elem, time){
+								let t;
+								if (time < 10) t = "0" + time;
+								else t = String(time);
+								let t1 = t.slice(0, 1);
+								let t2 = t.slice(1, 2);
+								elem.find(".num").eq(0).attr("data-timer-val", t1).text(t1);
+								elem.find(".num").eq(1).attr("data-timer-val", t2).text(t2);
+							};
+							let timer = $(".main-today .timer");
+							mm(timer.find(".nums.h"), hours);
+							mm(timer.find(".nums.m"), minutes);
+							mm(timer.find(".nums.s"), seconds);
+						}, 1000);
+						</script>
+						<!-- ↑ 오늘의 특가 -->
+
+						<!-- ↓ 인기기획전 2020-06-23, 2020-10-19 상품카드 변경 -->
+						<h2 class="home-stit-18">인기 행사만 모았어요!</h2>
+						<div class="jdm-pop-exhbn">
+							<div class="swiper-container prod-list" id="jdpe">
+								<div class="pagination">
+								</div>
+								<ul class="swiper-wrapper">
+									<li class="swiper-slide" style="background-image:url('https://image.oliveyoung.co.kr/uploads/images/display/90000010001/139/6319735426592972376.jpg');" data-hashtag="몇자가들어가나">
+										<!--
+											2020-07-09 카피 영역 수정
+											span.exhbn-tit width:140px; 한글 기준 줄 당 8자 내외. 길면 자동으로 줄 내림. 두 줄 이상 넘어가지 않고 말줄임 처리.
+											span.exhbn-stit width:auto; 메인카피와 비슷한 너비로는 대략 한글 15자 내외.
+										-->
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">일이삼사오육칠팔구십일이삼사오육칠팔구십</span>
+											<span class="exhbn-stit">일이삼사오육칠팔구십일이삼사오육칠팔구십</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트  디파일러 파이리 꼬부기 광전사 시공의 폭풍으로 오버워치 기획 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('https://image.oliveyoung.co.kr/uploads/images/display/90000010001/139/976217314145934418.jpg');" data-hashtag="우리집오늘드림">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">우리집에도 오늘드림이 올까요?</span>
+											<span class="exhbn-stit">확인만해도CJONE포인트증정</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트  디파일러 파이리 꼬부기 광전사 시공의 폭풍으로 오버워치 기획 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('https://image.oliveyoung.co.kr/uploads/images/display/90000010001/139/6552267153719868710.jpg');" data-hashtag="마몽드블루캐모마일크림">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">마몽드의#찐한진정 블루캐모마일크림런칭</span>
+											<span class="exhbn-stit">#금액대별 증정혜택</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트  디파일러 파이리 꼬부기 광전사 시공의 폭풍으로 오버워치 기획 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('https://image.oliveyoung.co.kr/uploads/images/display/90000010001/139/6280087778495005751.jpg');" data-hashtag="에뛰드">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">에뛰드 더블래스팅 쿠션커버with솔미</span>
+											<span class="exhbn-stit">#피지쏙  베이스키트증정</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트  디파일러 파이리 꼬부기 광전사 시공의 폭풍으로 오버워치 기획 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('https://image.oliveyoung.co.kr/uploads/images/display/90000010001/139/5134295922999797600.jpg');" data-hashtag="완벽한여름">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">완벽한 여름을 위해 최대15%+한정증정</span>
+											<span class="exhbn-stit">M.A.C 헤라 크리니크 등</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트  디파일러 파이리 꼬부기 광전사 시공의 폭풍으로 오버워치 기획 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('https://image.oliveyoung.co.kr/uploads/images/display/90000010001/139/7119365775490494476.jpg');" data-hashtag="덴탈케어페리오">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">COOL 덴탈케어 페리오로 시원하게!</span>
+											<span class="exhbn-stit">#최대1+1 #7%쿠폰</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트  디파일러 파이리 꼬부기 광전사 시공의 폭풍으로 오버워치 기획 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 세트</p>
+													<p class="price">
+														<span class="rate">50%</span><span class="strike">53,000<span class="won">원</span></span>
+														<span class="total">832,000<span class="won">원</span></span>
+													</p>
+												</a>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<script>
+							//shuffle
+							$.fn.shuffle = function() {
+								var allElems = this.get(),
+									getRandom = function(max) {
+										return Math.floor(Math.random() * max);
+									},
+									shuffled = $.map(allElems, function(){
+										var random = getRandom(allElems.length),
+											randEl = $(allElems[random]).clone(true)[0];
+										allElems.splice(random, 1);
+										return randEl;
+									});
+								this.each(function(i){
+									$(this).replaceWith($(shuffled[i]));
+								});
+								return $(shuffled);
+							};
+							//셔플 먼저
+							$("#jdpe>.swiper-wrapper>.swiper-slide").shuffle();
+							// var hashtags = ["봄향기", "다이어트", "단종수비대", "민감성", "5분만에외출준비끝", "홈케어의정석"];
+							//swiper 생성
+							var jdpeSwiper = new Swiper('#jdpe', {
+								initialSlide: 0,
+								loop: true,		//2020-07-20 루프 추가됨.
+								speed: 300,
+								slidesPerView: '1.15',
+								spaceBetween: 5,
+								pagination: ".pagination",
+								paginationClickable: true,
+								paginationBulletRender(swiper, index, className){
+									//2020-07-13 불릿(탭) 텍스트 변경
+									return '<button type="button" class="' + className + '">' + "#" + $("#jdpe>.swiper-wrapper>.swiper-slide").eq(index + 1).attr("data-hashtag") + '</button>';
+								}
+							});
+						</script>
+						<!-- ↑ 인기기획전 -->
+
+						<!-- 2020-09-07 카테고리 랭킹 (카테고리 베스트) -->
+						<div class="main-cate-rank">
+							<h2 class="home-stit-18">카테고리 랭킹</h2>
+							<a href="main/getBestAjax.do" class="link-best">전체보기</a>
+							<div class="cate swiper-container">
+								<ul class="swiper-wrapper">
+									<li class="swiper-slide" data-ref-idx="0"><a href="#">스킨케어</a></li>
+									<li class="swiper-slide" data-ref-idx="1"><a href="#">메이크업</a></li>
+									<li class="swiper-slide" data-ref-idx="2"><a href="#">바디케어</a></li>
+									<li class="swiper-slide" data-ref-idx="3"><a href="#">헤어케어</a></li>
+									<li class="swiper-slide" data-ref-idx="4"><a href="#">향수/디퓨저</a></li>
+									<li class="swiper-slide" data-ref-idx="5"><a href="#">미용소품</a></li>
+									<li class="swiper-slide" data-ref-idx="6"><a href="#">남성</a></li>
+									<li class="swiper-slide" data-ref-idx="7"><a href="#">건강/위생용품</a></li>
+									<li class="swiper-slide" data-ref-idx="8"><a href="#">건강식품</a></li>
+									<li class="swiper-slide" data-ref-idx="9"><a href="#">일반식품</a></li>
+									<li class="swiper-slide" data-ref-idx="10"><a href="#">반려동물</a></li>
+									<li class="swiper-slide" data-ref-idx="11"><a href="#">베이비</a></li>
+									<li class="swiper-slide" data-ref-idx="12"><a href="#">잡화</a></li>
+								</ul>
+							</div>
+							<div class="rank prod-list h1">
+								<ul>
+									<li>
+										<a href="#" class="title">
+											<span class="num">1.</span>	<!-- span.num 뒤로 공백 유지해주세요. -->
+											라운드랩 자작나무 수분 크림 1+1
+										</a>
+										<div class="prod-wrap">
+											<div class="prod">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge new">신상</span>
+												</a>
+												<div class="prod-info">
+													<a href="#">
+														<div class="brand">
+															<span class="brand-name">라운드랩</span>
+														</div>
+														<span class="prod-name double-line">라운드랩 자작나무 수분 크림 1+1</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+															<span class="oneday">오늘드림</span>
+														</div>
+														<div class="flags">
+															<span class="flag plus">1+1</span>
+														</div>
+													</a>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</li>
+									<li>
+										<a href="#" class="title"><span class="num">2.</span> 마크제이콥스 스플래시 레인 오 뚜왈렛 100ml</a>
+										<div class="prod-wrap">
+											<div class="prod">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge new">신상</span>
+												</a>
+												<div class="prod-info">
+													<a href="#">
+														<div class="brand">
+															<span class="brand-name">마크제이콥스</span>
+														</div>
+														<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+														</div>
+														<div class="flags">
+															<span class="flag present">GIFT</span>
+															<span class="flag plus">1+1</span>
+															<span class="flag sale">세일</span>
+															<span class="flag coupon">쿠폰</span>
+															<span class="flag gift">증정</span>
+															<span class="flag free">무배</span>
+														</div>
+													</a>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</li>
+									<li>
+										<a href="#" class="title"><span class="num">3.</span> 루나 롱래스팅 컨실웨어 쿠션 한정 기획(리필 +퍼프 2개 증정)</a>
+										<div class="prod-wrap">
+											<div class="prod">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge new">신상</span>
+												</a>
+												<div class="prod-info">
+													<a href="#">
+														<div class="brand">
+															<strong class="exclusive">EXCLUSIVE</strong>
+															<span class="brand-name">루나</span>
+														</div>
+														<span class="prod-name double-line">롱래스팅 컨실웨어 쿠션 한정 기획(리필 +퍼프 2개 증정</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+															<span class="oneday">오늘드림</span>
+														</div>
+														<div class="flags">
+															<span class="flag present">GIFT</span>
+															<span class="flag sale">세일</span>
+														</div>
+													</a>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</li>
+									<li>
+										<a href="#" class="title"><span class="num">4.</span> 롬앤 제로 매트 립스틱</a>
+										<div class="prod-wrap">
+											<div class="prod">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge new">신상</span>
+												</a>
+												<div class="prod-info">
+													<a href="#">
+														<div class="brand">
+															<span class="brand-name">롬앤</span>
+														</div>
+														<span class="prod-name double-line">롬앤 제로 매트 립스틱</span>
+														<div class="discount">
+															<strong class="rate-of">50%</strong>
+															<span class="origin">123,450</span>
+														</div>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+															<span class="oneday">오늘드림</span>
+														</div>
+														<div class="flags"></div>
+													</a>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</li>
+									<li>
+										<a href="#" class="title"><span class="num">5.</span> 클리오 샤프, 쏘 심플 워터프루프 펜슬 라이너</a>
+										<div class="prod-wrap">
+											<div class="prod">
+												<a href="#" class="thumb">
+													<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													<span class="flag-badge best">베스트</span>
+												</a>
+												<div class="prod-info">
+													<a href="#">
+														<div class="brand">
+															<strong class="exclusive">EXCLUSIVE</strong>
+															<span class="brand-name">클리오</span>
+														</div>
+														<span class="prod-name double-line">클리오 샤프, 쏘 심플 워터프루프 펜슬 라이너</span>
+														<div class="price">
+															<strong class="total">61,720<span class="won">원</span></strong>
+															<span class="oneday">오늘드림</span>
+														</div>
+														<div class="flags">
+															<span class="flag free">무배</span>
+														</div>
+													</a>
+													<div class="prod-func">
+														<button type="button" class="favorite">찜하기</button>
+														<button type="button" class="cart">장바구니 담기</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<script>
+							$(function(){
+								const caterank = $(".main-cate-rank");
+								const cate = caterank.find(".cate");
+								const ranks = caterank.find(".rank");
+								const rank = ranks.find("li");
+								// 전체보기 버튼
+								caterank.on("click touch", ".link-best", function(e){
+									e.preventDefault();
+									// $("#mGnb li:nth-child(4) a")[0].click();
+									stopInterval();
+								});
+								// 카테고리 swiper
+								let initNum = Date.now() % rank.length;		//랜덤 노출
+								const cateSwiper = new Swiper(cate, {
+									initialSlide: initNum,
+									slidesPerView: "auto",
+									freeMode: true,
+									onInit(swiper){
+										$(swiper.slides[initNum]).addClass("active");
+										scrollToTabMenu(initNum, cate, cate.find(".swiper-wrapper"));
+										// 클릭
+										cate.find("a").on("click touch", function(e){
+											e.preventDefault();
+											let pLi = $(this).closest("li");
+											if ( !pLi.hasClass("active") ) {
+												cate.find("li.active").removeClass("active");
+												pLi.addClass("active");
+               									scrollToTabMenu(pLi.attr("data-ref-idx"), cate, cate.find(".swiper-wrapper"));
+												// ↓ 여기에 클릭시 화면 다시 그리기
+											}
+										});
+									}
+								});
+								// ↓ main.js 에 있는 기존부터 쓰이던 함수 입니다.
+								function scrollToTabMenu (gnbTabIdx, menuTag, menu) {
+									var width = $(document).width();
+									var menuBarWidth = 0;
+
+									var gnbMenuTag = $(menuTag).find('ul');
+									var gnbMenu = $(menu);
+									//cell width
+									var gnbCellWidth = gnbMenuTag.find("li").eq(gnbTabIdx).outerWidth();
+									var gnbCellCnt = gnbMenuTag.find("li").length;
+
+									//화면 - 가운데 offset left 조회
+									var documentOffsetLeft = Math.round(width / 2) - Math.round(gnbCellWidth / 2);
+									var documentOffsetRight = Math.round(width / 2) + Math.round(gnbCellWidth / 2);
+
+									var documentHalfWidth = Math.round(width / 2);
+
+									var fixedLeftPositionIdx = 0;
+									var fixedRightPositionIdx = 0;
+
+									gnbMenuTag.find("li").each(function() {
+									menuBarWidth += $(this).outerWidth();
+									});
+
+									if (menuBarWidth <= width) {
+										return;
+									}
+
+									var checkSum = 0;
+
+									//위치 fix가 필요없는 index 조회(양쪽 끝에 위치하는 cell 중 몇개까지 양끝으로 무조건 이동시키면 되는지..)
+									for (var i = 0; i < gnbCellCnt; i++) {
+										checkSum += gnbMenuTag.find("li").eq(i).outerWidth() / 2;
+										if (checkSum > documentHalfWidth) {
+											fixedLeftPositionIdx = i - 1;
+											break;
+										} else {
+											checkSum += gnbMenuTag.find("li").eq(i).outerWidth() / 2;
+										}
+									}
+
+									checkSum = 0;
+									for (var i = gnbCellCnt - 1; i >= 0; i--) {
+										checkSum += gnbMenuTag.find("li").eq(i).outerWidth() / 2;
+										if (checkSum > documentHalfWidth) {
+											fixedRightPositionIdx = i + 1;
+											break;
+										} else {
+											checkSum += gnbMenuTag.find("li").eq(i).outerWidth() / 2;
+										}
+									}
+
+									//왼쪽끝에 위치시킬 메뉴 idx일 경우
+									if (gnbTabIdx <= fixedLeftPositionIdx) {
+										setTimeout(function(){gnbMenu.css({
+											"transform": "translate3d(0px, 0, 0)",
+											"transition-duration": "500ms"
+										})}, 200);
+
+									//오른쪽 끝에 위치시킬 메뉴 idx일 경우
+									} else if (gnbTabIdx >= fixedRightPositionIdx) {
+										setTimeout(function(){gnbMenu.css({
+											"transform": "translate3d(" + (-1 * (parseInt(menuBarWidth) - width)) + "px, 0, 0)",
+											"transition-duration": "500ms"
+										})}, 200);
+
+									//그 외 가운데 위치시킬 메뉴일 경우
+									} else {
+										checkSum = 0;
+										for (var i = 0; i < gnbTabIdx; i++) {
+											checkSum += gnbMenuTag.find("li").eq(i).outerWidth();
+										}
+										setTimeout(function(){gnbMenu.css({
+											"transform": "translate3d(" + (-1 * (checkSum - documentOffsetLeft)) + "px, 0, 0)",
+											"transition-duration": "500ms"
+										})}, 200);
+									}
+
+								}
+
+								// 이 아래로는 카테고리 선택 후 실행되는 기능
+								let isInterval = false;
+								let rankInterval;
+								function startInterval(){
+									isInterval = false;
+									rankInterval = setInterval(function(){
+										autoNextRank();
+									}, 4000);
+								};
+								function stopInterval(){
+									clearInterval(rankInterval);
+									isInterval = true;
+								};
+								function showNextRank(num){
+									let ST = $(window).scrollTop();
+									let active = rank.filter(".active");
+									active.removeClass("active");
+									rank.eq(num).addClass("active");
+									if ( $(window).scrollTop != ST ) {
+										$(window).scrollTop(ST);
+									};
+								};
+								function autoNextRank(){
+									let actNum = rank.filter(".active").index();
+									let nextNum = ( actNum + 1 < rank.length ) ? actNum + 1 : 0;
+									showNextRank(nextNum);
+								};
+								// 시작시 실행
+								ranks.find("li:first-child").addClass("active");
+								startInterval();
+								// 랭킹 텍스트 링크 클릭시
+								rank.find(".title").on("click touch", function(e){
+									e.preventDefault();
+									if ( $(this).parent(rank).hasClass("active") ) {
+										return;
+									} else {
+										stopInterval();
+										showNextRank($(this).parent(rank).index());
+										startInterval();
+									};
+								});
+							});
+						</script>
+						<!-- 카테고리 랭킹 -->
+
+						<!-- ↓ 2020-09-01 주목해야할 브랜드 (인기브랜드) -->
+						<div class="main-hit-brand-wrap">
+							<h2 class="home-stit-18">주목해야할 브랜드</h2>
+							<div class="main-hit-brand">
+								<div class="brand-list">
+									<ul>
+										<li class="active"><a href="#">닥터자르트</a></li>
+										<li><a href="#">아비브</a></li>
+										<li><a href="#">닥터지</a></li>
+										<li><a href="#">어반디케이</a></li>
+										<li><a href="#">보타닉힐보아이디얼포맨</a></li>
+										<li><a href="#">브랜드명브랜드명브랜드명6</a></li>
+										<li><a href="#">brand name7</a></li>
+										<li><a href="#">brand namebrand name8</a></li>
+										<li><a href="#">브랜드명9</a></li>
+										<li><a href="#">브랜드명10</a></li>
+									</ul>
+								</div>
+								<div class="prod-wrap">
+									<div class="banner" style="background-image:url('https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/412839005156779407.jpg');">
+										<a href="#">
+											<div class="zzim">3,855</div>
+											<p class="copy">피부를 연구하는 피부 전문가</p>
+											<p class="brand-name">닥터자르트</p>
+										</a>
+									</div>
+									<!-- ↓ 목록 -->
+									<div class="prod-list v2">
+
+										<div class="prod">
+											<div class="prod-inner">
+												<div class="thumb-wrap">
+													<a href="#" class="thumb">
+														<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+													</a>
+												</div>
+												<div class="prod-info-wrap">
+													<div class="prod-info">
+														<a href="#">
+															<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+															<div class="price">
+																<strong class="total">61,720원</strong>
+															</div>
+														</a>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div class="prod">
+											<div class="prod-inner">
+												<div class="thumb-wrap">
+													<a href="javascript:;" class="thumb goodsList" data-ref-goodsno="A000000113625" data-ref-dispcatno="90000010001" data-ref-itemno="001">
+														<img data-original="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0011/A00000011362502ko.jpg?l=ko"alt="[온라인단독] DHC 딥클렌징오일 200mlX2 더블기획" class="pic-thumb completed-scroll-lazyload" onerror="common.errorImg(this);" src="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0011/A00000011362502ko.jpg?l=ko">
+														<span class="soldOut">일시품절</span >
+													</a>
+												</div>
+												<div class="prod-info-wrap">
+													<div class="prod-info">
+														<a href="#">
+															<span class="prod-name double-line">닥터자르트 시카페어</span>
+															<div class="price">
+																<strong class="total">61,720원</strong>
+															</div>
+														</a>
+													</div>
+												</div>
+											</div>
+										</div>
+
+									</div>
+									<!-- ↑ 목록 -->
+								</div>
+							</div>
+						</div>
+						<script>
+							$(".main-hit-brand .brand-list li a").on("click touch", function(e){
+								e.preventDefault();
+								$(this).parent().addClass("active").siblings(".active").removeClass("active");
+							});
+						</script>
+						<!-- ↑ 주목해야할 브랜드 -->
+
+						<!-- 2020-07-29 올알랭 가이드 -->
+						<!-- ↓ 올알랭 가이드 ("올"리브영이 "알"려주는 "랭"킹) -->
+						<div class="allalain">
+							<h2 class="home-stit-18">올알랭 가이드</h2>
+							<button type="button" class="btn-show-layer" onclick="common.oyFullOpen('layer-allalain');">더보기</button>
+							<!--↓ 영상 제목 -->
+							<h3 class="tit-allalain">잡티를 가려줄 강력 컨실러 TOP 5</h3>
+
+							<!-- ↓ 영상 -->
+							<div id="yt-player"></div>
+
+							<h4 class="tit-allalain-s">컨실러 1위 ~ 2위</h4>
+							<div class="prd-cont active">
+
+								<!-- ↓ item -->
+								<div class="prd-item">
+									<div class="prd-thumb">
+										<img src="https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0013/A00000013778701ko.jpg?l=ko" alt="@썸네일">
+										<button type="button" class="time-stamp" data-timeline="93">01:33</button>
+									</div>
+									<div class="prd-detail">
+										<a href="#" class="prd-link">
+											<strong class="prd-brand">올리브영</strong>
+											<span class="prd-name">쉬즈라인 겨드랑이 땀패드(5쌍) 남녀 공용 겨드랑이 패드 옷 얼룩짐 방지 슬림한 두께감</span>
+										</a>
+										<div class="price-wrap">
+											<a href="#">
+												<span class="strike">53,000<span class="won">원</span></span>
+												<strong class="price">832,000원</strong>
+											</a>
+											<button type="button" class="prd-cart">장바구니</button>
+										</div>
+									</div>
+								</div>
+								<!-- ↑ item -->
+
+								<h5 class="tit-allalain-ss">함께쓰면 좋을 꿀 조합템</h5>
+								<div class="addon">
+
+									<!-- ↓ item -->
+									<div class="prd-item">
+										<a href="#" class="prd-thumb">
+											<img src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/139/3242182483914317772.jpg" alt="@썸네일">
+										</a>
+										<div class="prd-detail">
+											<a href="#" class="prd-link">
+												<strong class="prd-brand">보타닉힐보 아이디얼포맨</strong>
+												<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝 멀티 태스커 파운데이션 미니 메이크업</span>
+											</a>
+										</div>
+									</div>
+									<!-- ↑ item -->
+
+									<!-- ↓ item -->
+									<div class="prd-item">
+										<a href="#" class="prd-thumb">
+											<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+										</a>
+										<div class="prd-detail">
+											<a href="#" class="prd-link">
+												<strong class="prd-brand">불독</strong>
+												<span class="prd-name">미니 파운데이션</span>
+											</a>
+										</div>
+									</div>
+									<!-- ↑ item -->
+
+								</div>
+							</div>
+
+							<div class="prd-cont">
+								<!-- ↓ item -->
+								<div class="prd-item">
+									<div class="prd-thumb">
+										<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+										<button type="button" class="time-stamp" data-timeline="615">10:15</button>
+									</div>
+									<div class="prd-detail">
+										<a href="#" class="prd-link">
+											<strong class="prd-brand">보타닉힐보 아이디얼포맨</strong>
+											<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝 멀티 태스커 파운데이션 미니 메이크업</span>
+										</a>
+										<div class="price-wrap">
+											<a href="#">
+												<span class="strike">53,000<span class="won">원</span></span>
+												<strong class="price">832,000원</strong>
+											</a>
+											<button type="button" class="prd-cart">장바구니</button>
+										</div>
+									</div>
+								</div>
+								<!-- ↑ item -->
+							</div>
+
+							<h4 class="tit-allalain-s">쿠션부문 1위</h4>
+
+							<div class="prd-cont">
+								<!-- ↓ item -->
+								<div class="prd-item">
+									<div class="prd-thumb">
+										<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+										<button type="button" class="time-stamp" data-timeline="305">05:05</button>
+									</div>
+									<div class="prd-detail">
+										<a href="#" class="prd-link">
+											<strong class="prd-brand">웨이크메이크</strong>
+											<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝</span>
+										</a>
+										<div class="price-wrap">
+											<a href="#">
+												<span class="strike">53,000<span class="won">원</span></span>
+												<strong class="price">832,000원</strong>
+											</a>
+											<button type="button" class="prd-cart">장바구니</button>
+										</div>
+									</div>
+								</div>
+								<!-- ↑ item -->
+							</div>
+
+							<h4 class="tit-allalain-s">파운데이션부문 1위</h4>
+
+							<div class="prd-cont">
+								<!-- ↓ item -->
+								<div class="prd-item">
+									<div class="prd-thumb">
+										<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+										<button type="button" class="time-stamp" data-timeline="361">06:01</button>
+									</div>
+									<div class="prd-detail">
+										<a href="#" class="prd-link">
+											<strong class="prd-brand">웨이크메이크</strong>
+											<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝</span>
+										</a>
+										<div class="price-wrap">
+											<a href="#">
+												<span class="strike">53,000<span class="won">원</span></span>
+												<strong class="price">832,000원</strong>
+											</a>
+											<button type="button" class="prd-cart">장바구니</button>
+										</div>
+									</div>
+								</div>
+								<!-- ↑ item -->
+							</div>
+
+						</div>
+						<script>
+							// @조상혁님, 쓸데 없는 주석이나 가공 해야 할 부분이 많을 수 있습니다.
+							// https://developers.google.com/youtube/iframe_api_reference
+							// 해당 링크 데모로 수정한 스크립트 입니다.
+							// 자동 재생 관련 링크
+							// https://developers.google.com/youtube/iframe_api_reference?hl=ko#Mobile_considerations
+
+							// 2. This code loads the IFrame Player API code asynchronously.
+							var tag = document.createElement('script');
+						
+							tag.src = "https://www.youtube.com/iframe_api";
+							var firstScriptTag = document.getElementsByTagName('script')[0];
+							firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+						
+							// 3. This function creates an <iframe> (and YouTube player)
+							//    after the API code downloads.
+							var player, player2;
+							function onYouTubeIframeAPIReady() {
+								player = new YT.Player('yt-player', {
+									height: '480',
+									width: '640',
+									videoId: 'DWuAn6C8Mfc',
+									playerVars: {
+										'playsinline': 1		//인라인으로 재생 (전체화면 아닌)
+									},
+									events: {
+										'onReady': onPlayerReady,
+										'onStateChange': onPlayerStateChange
+									}
+								});
+								player2 = new YT.Player('yt-player2', {
+									height: '480',
+									width: '640',
+									videoId: 'sCYzXDYN_vk',
+									playerVars: {
+										'playsinline': 1
+									}
+								});
+							}
+						
+							// 4. The API will call this function when the video player is ready.
+							function onPlayerReady(event) {
+								let isScroll = true;
+								let networkcondition = "wifi";
+								let intViewportHeight = $(window).innerHeight();
+								let YTArea = $("#yt-player");
+								let some1 = YTArea.offset().top;							// 아래에 걸린 경우
+								let some2 = some1 + YTArea.height() - intViewportHeight;	// 위에 걸린 경우
+								player.mute();		//음소거 추가
+								if ( $(window).scrollTop() <= some1 && $(window).scrollTop() >= some2 ) {
+									//로드 될 때 화면에 보이니?
+									event.target.playVideo();
+									isScroll = false;
+								} else {
+									//로드 될 때 안보이니?
+									if ( networkcondition === "wifi" ) {
+										//와이파이니?
+										$(window).on("scroll", function(){
+											scrollTop = $(window).scrollTop();
+											if ( isScroll && scrollTop <= some1 && scrollTop >= some2 ) {
+												//스크롤 할 때 화면에 보이니?
+												event.target.playVideo();
+												isScroll = false;
+											};
+										});
+									};
+								};
+							}
+
+							// 5. The API calls this function when the player's state changes.
+							function onPlayerStateChange(event) {
+								let intViewportHeight = $(window).innerHeight();
+								let YTArea = $("#yt-player");
+								let some1, some2;
+								let isPlaying = false;
+								let isPaused = false;
+								if (event.data == YT.PlayerState.PLAYING) {
+									//재생 중일 때 스크롤 시 일시중지 (탭은 이미 잘 되고 있어서)
+									some1 = YTArea.offset().top + YTArea.height() - 37;			// 스크롤 내릴 때
+									some2 = some1 - intViewportHeight - YTArea.height() + 87;	// 스크롤 올릴 때
+									isPlaying = true;
+									$(window).on("scroll", function(){
+										scrollTop = $(window).scrollTop();
+										if ( isPlaying && scrollTop >= some1 || scrollTop <= some2 ) {
+											event.target.pauseVideo();
+											isPlaying = false;
+										} else {
+											return;
+										};
+									});
+								} else if (event.data == YT.PlayerState.PAUSED && isPaused == false) {
+									//일시중지 중일 때 스크롤 시 다시 재생
+									some1 = YTArea.offset().top;							// 아래에 걸린 경우
+									some2 = some1 + YTArea.height() - intViewportHeight;	// 위에 걸린 경우
+									isPaused = true;
+									$(window).on("scroll", function(){
+										scrollTop = $(window).scrollTop();
+										if ( isPaused && scrollTop <= some1 && scrollTop >= some2 ) {
+											event.target.playVideo();
+											isPaused = false;
+										} else {
+											return;
+										};
+									});
+								} else if (event.data == YT.PlayerState.ENDED) {
+									//끝났니? 멈출래?
+									player.setLoop(false);
+								}
+							}
+							function stopVideo() {
+								player.stopVideo();
+							};
+							// 팝업 비디오 변경 예시
+							function changeVideo(videoId){
+								player2.loadVideoById(videoId).stopVideo().mute();
+							};
+							$(function(){
+								//타임스탬프
+								let btnTimeStamp = $(".allalain .time-stamp");
+								btnTimeStamp.on("click touch", function(){
+									let seekto = $(this).attr("data-timeline");
+									if ( seekto ) {
+										//player.seekTo(seconds:Number, allowSeekAhead:Boolean):Void
+										player.seekTo(seekto, true);
+									} else {
+										if ( !YT.PlayerState.PLAYING ) {
+											player.playVideo();
+										};
+									};
+								});
+
+								//[TEST] scrollTop 확인용 
+								let pastSCR;
+								let currentSCR;
+								let printSCR;
+								$(window).scroll(function(){
+									printSCR = setInterval(function(){
+										currentSCR = $(window).scrollTop();
+										if ( pastSCR !== currentSCR ) {
+											// console.log(currentSCR);
+											pastSCR = currentSCR;
+										} else {
+											clearInterval(printSCR);
+										};
+									}, 500);
+								});
+							});
+						</script>
+						<!-- ↑ 올알랭 가이드 -->
+
+						<!-- 2020-08-12 OY 추천상품 -->
+						<!-- ↓ OY 추천상품 -->
+						<h2 class="home-stit-18">이 상품 어때요?</h2>
+						<div class="oy-recomm-prod">
+							<!-- ↓ 목록 -->
+							<div class="prod-list v2">
+								
+								<!-- ↓ 상품 -->
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 -->
+										<div class="thumb-wrap">
+											<a href="#" class="thumb">
+												<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+												<span class="flag-badge best">베스트</span>
+											</a>
+										</div>
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand"></div>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">마크제이콥스 스플래시 레인 버터플 야도랑 피존투 오 드 뚜왈렛 100ml</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+														<span class="oneday">오늘드림</span>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(999+)</span>
+													</div>
+													<div class="flags">
+														<span class="flag present">GIFT</span>
+														<span class="flag plus">1+1</span>
+														<span class="flag sale">세일</span>
+														<span class="flag coupon">쿠폰</span>
+														<span class="flag gift">증정</span>
+														<span class="flag free">무배</span>
+													</div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+								<!-- ↑ 상품 -->
+
+								<!-- ↓ 상품 2 -->
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 / 성인인증 -->
+										<div class="thumb-wrap">
+											<a href="javascript:;" class="thumb goodsListLogin" data-ref-goodsno="A000000008456" data-ref-dispcatno="90000010001" data-ref-itemno="001">
+												<span class="minor"><em>성인인증</em> 후 구매가능</span>
+											</a>
+										</div>
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand"></div>
+												<div class="prod-func">
+													<button type="button" class="favorite active">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">스플래시 레인 오 드 뚜왈렛</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(999+)</span>
+													</div>
+													<div class="flags">
+														<span class="flag free">무배</span>
+														<span class="flag gift">증정</span>
+														<span class="flag present">GIFT</span>
+													</div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+								<!-- ↑ 상품 2 -->
+
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 / 판매종료 -->
+										<div class="thumb-wrap">
+											<a href="javascript:;" class="thumb goodsList" data-ref-goodsno="A000000113275" data-ref-dispcatno="90000010001" data-ref-itemno="001">
+												<img data-original="https://image.oliveyoung.co.kr/uploads/images/goods/10/0000/0010/A00000010337901ko.jpg?l=ko"alt="[온라인단독] 리얼베리어 익스트림 크림 마스크 10매" class="pic-thumb completed-scroll-lazyload" onerror="common.errorImg(this);" src="https://image.oliveyoung.co.kr/uploads/images/goods/10/0000/0010/A00000010337901ko.jpg?l=ko">
+												<span class="allsoldOut">판매종료</span >
+											</a>
+										</div>
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand"></div>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(999+)</span>
+													</div>
+													<div class="flags">
+														<span class="flag present">GIFT</span>
+													</div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 / 일시품절 -->
+										<div class="thumb-wrap">
+											<a href="javascript:;" class="thumb goodsList" data-ref-goodsno="A000000113625" data-ref-dispcatno="90000010001" data-ref-itemno="001">
+												<img data-original="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0011/A00000011362502ko.jpg?l=ko"alt="[온라인단독] DHC 딥클렌징오일 200mlX2 더블기획" class="pic-thumb completed-scroll-lazyload" onerror="common.errorImg(this);" src="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0011/A00000011362502ko.jpg?l=ko">
+												<span class="soldOut">일시품절</span >
+												<span class="flag-badge best">베스트</span>
+											</a>
+										</div>
+											
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand"></div>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+														<span class="oneday">오늘드림</span>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(999+)</span>
+													</div>
+													<div class="flags"></div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 -->
+										<div class="thumb-wrap">
+											<a href="#" class="thumb">
+												<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+												<span class="flag-badge best">베스트</span>
+											</a>
+										</div>
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand"></div>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+														<span class="oneday">오늘드림</span>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(999+)</span>
+													</div>
+													<div class="flags">
+														<span class="flag plus">1+1</span>
+													</div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 -->
+										<div class="thumb-wrap">
+											<a href="#" class="thumb">
+												<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+												<span class="flag-badge best">베스트</span>
+											</a>
+										</div>
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand"></div>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(2)</span>
+													</div>
+													<div class="flags">
+														<span class="flag free">무배</span>
+														<span class="flag gift">증정</span>
+														<span class="flag present">GIFT</span>
+													</div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 -->
+										<div class="thumb-wrap">
+											<a href="#" class="thumb">
+												<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+												<span class="flag-badge best">베스트</span>
+											</a>
+										</div>
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand"></div>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(999+)</span>
+													</div>
+													<div class="flags">
+														<span class="flag free">무배</span>
+														<span class="flag gift">증정</span>
+														<span class="flag plus">1+1</span>
+													</div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 -->
+										<div class="thumb-wrap">
+											<a href="#" class="thumb">
+												<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+												<span class="flag-badge best">베스트</span>
+											</a>
+										</div>
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand"></div>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(999+)</span>
+													</div>
+													<div class="flags">
+														<span class="flag free">무배</span>
+														<span class="flag present">GIFT</span>
+													</div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 -->
+										<div class="thumb-wrap">
+											<a href="#" class="thumb">
+												<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+												<span class="flag-badge best">베스트</span>
+											</a>
+										</div>
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand">
+													<strong class="exclusive">EXCLUSIVE</strong>
+												</div>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(999+)</span>
+													</div>
+													<div class="flags">
+														<span class="flag gift">증정</span>
+														<span class="flag present">GIFT</span>
+													</div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+
+								<div class="prod">
+									<div class="prod-inner">
+										<!-- ↓ 썸네일 -->
+										<div class="thumb-wrap">
+											<a href="#" class="thumb">
+												<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="불독" class="pic-thumb">
+												<span class="flag-badge best">베스트</span>
+											</a>
+										</div>
+										<!-- ↑ 썸네일 -->
+
+										<!-- ↓ 상품 정보 -->
+										<div class="prod-info-wrap">
+											<div class="prod-info">
+												<div class="brand"></div>
+												<div class="prod-func">
+													<button type="button" class="favorite">찜하기</button>
+													<button type="button" class="cart">장바구니 담기</button>
+												</div>
+												<a href="#">
+													<span class="prod-name double-line">마크제이콥스 스플래시 레인 오 드 뚜왈렛 100ml</span>
+													<div class="discount">
+														<strong class="rate-of">50%</strong>
+														<span class="origin">123,450원</span>
+													</div>
+													<div class="price">
+														<strong class="total">61,720<span class="won">원</span></strong>
+														<span class="oneday">오늘드림</span>
+													</div>
+													<div class="rating">
+														<span class="point">4.5</span>
+														<span class="num">(999+)</span>
+													</div>
+													<div class="flags">
+														<span class="flag free">무배</span>
+														<span class="flag gift">증정</span>
+														<span class="flag plus">1+1</span>
+														<span class="flag present">GIFT</span>
+													</div>
+												</a>
+											</div>
+										</div>
+										<!-- ↑ 상품 정보 -->
+
+									</div>
+								</div>
+
+							</div>
+						</div>
+						<script>
+							//찜버튼 토글
+							$("body").on("click touch", "button.favorite", function(){
+								//do something...
+								$(this).toggleClass("mClick");
+							});
+						</script>
+						<!-- ↑ OY 추천상품 -->
+					</div>
+					<!-- ↑ 홈 -->
+				</div>
+				<!-- ↑ swiper-wrapper -->
+			</div>
+			<!-- ↑ swiper-container -->
+
+		</div>
+		<!-- //#mContents -->
+	</div>
+	<!-- //#mContainer -->
+
+
+
+
+
+
+
+
+
+	<div class="fulsizePop" data-ref-comparekey="90000040003/42/temp_olive_new_bi.gif" style="display:none;top: 0px;" tabindex="0">
+		<div class="box">
+			<div class="video_area">
+				<img src="//image.oliveyoung.co.kr/uploads/contents/201911/29oyawards/mo_popup_banner.jpg" alt="2019 OLiveYoung Awards & Festa" />
+				<div class="innerPos">
+					<div id="promotion-video-player" class="video">
+						<iframe width="100%" height="100%" src="https://www.youtube.com/embed/GJDdBbgJafU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+					</div>
+				</div>
+			</div>
+
+			<div class="btn">
+				<button type="button" class="common_pop_close_oneday">하루동안 보지않기</button>
+				<button type="button" class="common_pop_close">닫기</button>
+			</div>
+		</div>
+	</div><!-- //동영상 버전 -->
+
+
+	<div class="fulsizePop" data-ref-comparekey="90000040003/42/temp_olive_new_bi.gif" style="display:none;top: 0px;" tabindex="0">
+		<div class="box">
+			<img src="https://image.oliveyoung.co.kr/uploads/images/display/90000040003/42/8803955862556087691.jpg" alt="라이브커머스" onclick="javascript:location.href='https://m.oliveyoung.co.kr/m/event/getEventDetail.do?evtNo=00000000006632';">
+			<div class="btn">
+				<button type="button" class="common_pop_close_oneday">하루동안 보지않기</button>
+				<button type="button" class="common_pop_close">닫기</button>
+			</div>
+		</div>
+	</div><!-- //일반 버전 -->
+
+
+
+
+	<!-- #mFooter -->
+	<div id="mFooter">
+		<div class="footer">
+			<h1 class="mTitle1v">씨제이올리브네트웍스 주식회사</h1>
+			<ul class="mlist1v-menu app"><!-- //2017-02-13 app일시 클래스 추가// -->
+				<li><a href="#" title="페이지 이동">로그아웃</a></li>
+				<!-- <li><a href="#" title="페이지 이동"><span>PC</span>버전 보기</a></li> app일시 비노출 -->
+				<li><a href="#" title="페이지 이동">고객센터</a></li>
+			</ul>
+			<p class="addr">
+				대표이사 : 허민호 &nbsp;|&nbsp; 사업자 등록번호 : <span class="inte">104-81-36565</span><br>
+				주소 : 경기도 성남시 분당구 분당로 55 분당퍼스트타워 5층<br>
+				통신판매업신고번호 : 제 <span class="inte">2012</span>-경기성남- <span class="inte">0544</span>호<br>
+				개인정보관리책임자 : 이병록<br>
+				호스팅 제공자 (주) &nbsp;<span class="inte">CJ</span>올리브네트웍스
+			</p>
+			<ul class="mlist2v-menu">
+				<li><span><a href="#" title="페이지 이동">사업자정보확인</a></span></li>
+				<li><span><a href="#" title="페이지 이동">LG U+ 구매안전 서비스</a></span></li>
+			</ul>
+			<h2 class="mTitle2v"><span>올리브영 고객센터</span></h2>
+			<!-- 2017-02-02 마크업 수정 -->
+			<div class="customerInfo">
+				<div class="box">
+					<h3>온라인몰 고객센터</h3>
+					<ul class="mlist3v-menu">
+						<li class="phone"><a href="tel:1522-0882">1522-0882</a></li>
+						<!-- 2017-02-21 수정 inquiry클래스 추가 고객센터 문의하기로 이동 -->
+						<li class="mail inquiry"><a href="#none">1<span>:</span>1 <strong>문의하기</strong></a></li>
+						<!-- //2017-02-21 수정 inquiry클래스 추가 고객센터 문의하기로 이동 -->
+					</ul>
+				</div>
+				<div class="box">
+					<h3>매장 고객센터</h3>
+					<ul class="mlist3v-menu">
+						<li class="phone"><a href="tel:1577-4881">1577-4881</a></li>
+						<li class="mail"><a href="mailto:oliveweb@cj.net">oliveweb@cj.net</a></li>
+					</ul>
+				</div>
+			</div>
+			<!-- //2017-02-02 마크업 수정 -->
+			<h2 class="mTitle3v">올리브영 <span>SNS</span> 공식계정</h2>
+			<ul class="mlist-sns">
+				<li class="facebook"><a href="#" title="페이지 이동">페이스북</a></li>
+				<li class="twitter"><a href="#" title="페이지 이동">트위터</a></li>
+				<li class="kakao"><a href="#" title="페이지 이동">카카오톡 플러스 친구</a></li>
+				<li class="ribyoung"><a href="#" title="페이지 이동">리브영 네이버 카페</a></li>
+				<li class="instagram"><a href="#" title="페이지 이동">인스타그램</a></li>
+			</ul>
+			<p class="copy">© 올리브영 <span>ALL RIGHTS RESERVED</span></p>
+			<ul class="mlist4v-menu">
+				<li><a href="#" title="페이지 이동">이용약관</a></li>
+				<li><a href="#" title="페이지 이동">개인정보처리방침</a></li>
+				<li><a href="#" title="페이지 이동">청소년보호방침</a></li>
+			</ul>
+		</div>
+	</div>
+	<!-- //#mFooter -->
+
+	<div id="fixBtn" class="on">
+		<!-- <a href="#none" class="btnBack"><span>이전 페이지로</span></a> -->
+		<a href="#none" class="btnTop"><span>맨위로</span></a>
+	</div>
+
+	<!-- 스티키 -->
+	<div class="footerTab on lci" id="footerTab">
+		<ul class="list">
+			<li class="item01" id="footerTabCategoy"><a href="javascript:;">카테고리</a></li>
+			<li class="item02" id="footerTabSearch"><a href="javascript:;">검색</a></li>
+			<li class="item03 in" id="footerTabHome"><a href="javascript:;">홈</a></li>
+			<li class="item04"><a href="javascript:;" id="footerTabMypage">마이페이지</a>
+				<div class="main_toast on" id="_gdasGuidePopup" style="display: none;" onclick="location.href='mypage/getGdasList.do';">
+					<div class="toast_con">
+						<span>구매한 상품<br><em>리뷰 작성하세요!</em></span> 
+					</div> 
+				</div>
+			</li>
+			<li class="item05" id="footerTabRecentGoods">
+				<a href="javascript:;">
+					<!-- 최근 본 상품 없는 경우 기존과 동일하게 thum style="display:none;" -->
+					<span class="thum"><img src="https://image.oliveyoung.co.kr/uploads/images/goods/140/10/0000/0011/A00000011627602ko.jpg?l=ko" onerror="common.errorImg(this);" alt="유명상품"></span>
+					최근본상품
+				</a>
+			</li>
+		</ul>
+	</div>
+	<!-- //스티키 -->
+
+	<!-- ↓ 2020-10-20 쇼핑알림서비스 -->
+	<div class="noti-assistant">
+		<div class="inner swiper-container">
+			<ul class="swiper-wrapper">
+				<li class="swiper-slide"><a href="#"><span class="flag onair">ON AIR</span><span class="msg"><span class="point">[올라이브]</span> &lsquo;제니하우스&rsquo; 황보 전격출연!</a></li>
+				<li class="swiper-slide"><a href="#"><span class="msg">[올라이브] 입장까지 <span class="point countdown">01:33:26</span> 남았어요</span></a></li>
+				<li class="swiper-slide"><a href="#"><span class="msg">&lsquo;좋아요&rsquo; 한 상품이 쿠폰 <span class="point">할인 중</span>입니다</span></a></li>
+				<li class="swiper-slide"><a href="#"><span class="msg">&lsquo;좋아요&rsquo; 한 상품이 <span class="point"></span>세일 중</span>입니다</span></a></li>
+				<li class="swiper-slide"><a href="#"><span class="msg">구매한 상품의 <span class="point">리뷰를 작성</span>해주세요</span></a></li>
+				<li class="swiper-slide"><a href="#"><span class="msg">주문하신 상품이 <span class="point">배송 중</span>입니다</span></a></li>
+				<li class="swiper-slide"><a href="#"><span class="msg">기다리신 상품이 <span class="point">재입고</span> 되었습니다</span></a></li>
+				<li class="swiper-slide"><a href="#"><span class="msg">1:1 문의에 <span class="point">답변이</span> 등록되었습니다</span></a></li>
+			</ul>
+		</div>
+	</div>
+	<script>
+		let noti = $(".noti-assistant");
+		if ( noti.length ) {
+			let notisiblings = $("#mHeader.lci.ixHead, #fixBtn, #footerTab");
+			notisiblings.addClass("noti-siblings");
+			// 목록이 2개 이상일 때
+			if ( noti.find("li.swiper-slide").length > 1 ) {
+				let notiS = new Swiper(noti.children(".inner"), {
+					direction: 'vertical',
+					autoplay: 5000,
+					loop: true,
+					speed: 200,
+					onInit(swiper){
+						let $footerTab = $("#footerTab");
+						//최초 노출 시 autoplay 실행
+						if ( !$footerTab.hasClass("on") ) swiper.stopAutoplay();
+						// footerTab 클래스 변경 감지 → 변경 시 autoplay 제어
+						let classNames = "";
+						let observer = new MutationObserver(function(mutations) {
+							mutations.forEach(function(mutation) {
+								if (mutation.attributeName === "class") {
+									let attributeValue = $(mutation.target).prop(mutation.attributeName);
+									if ( attributeValue != classNames ) {
+										classNames = attributeValue;
+										if ( classNames.indexOf("on") == "-1" ) {
+											swiper.stopAutoplay();
+										} else {
+											swiper.startAutoplay();
+										};
+									}
+								}
+							});
+						});
+						observer.observe($footerTab[0], {
+							attributes: true
+						});
+					}
+				});
+			};
+		};
+	</script>
+	<!-- ↑ 쇼핑알림서비스 -->
+
+	<!-- 토스트 팝업  오프라인 리뷰 -->
+	<div class="main_toast on" style="display:none;">
+		<div class="toast_con">
+			<span>구매한 상품<br><em>리뷰 작성하세요!</em></span>
+		</div>
+	</div>
+	<!-- //토스트 팝업 -->
+
+</div>
+<!-- //#mWrapper -->
+
+
+<div id="mSearchWrapper">
+	<button>검색레이어 닫기</button>
+
+</div>
+
+<!-- #[3331722]큐레이션 영역 마케팅 활용 동의 수집 내용 변경 -->
+<div class="popLayerWrap" id="curation_agreed">
+	<!-- popLayerArea -->
+	<div class="popLayerArea">
+		<!-- popInner -->
+		<div class="popInner">
+			<div class="popHeader">
+				<h1 class="popTitle">개인정보 수집 및 활용 동의(선택)</h1>
+				<a href="#n" class="btnClose" onclick="popLayerClose('curation_agreed');return false;">닫기</a>
+			</div>
+			<!-- popContainer -->
+			<div class="popContainer">
+				<!-- popCont 스크롤 영역 -->
+				<div class="popCont">
+					<p class="txtbf14">마케팅 활용을 위한 개인정보 수집 및 활용 동의에 동의하시면 상품 추천 서비스를 받으실 수 있습니다.</p>
+					<div class="picBox">
+						<div class="pic_inner">
+							<h3 class="tit">개인정보 수집 및 활용 동의</h3>
+							<p class="txt">이벤트, 쿠폰 및 혜택 등에 대한 정보를 받으시려면 개인정보 수집 및 활용에 대한 동의를 선택하셔야 합니다.</p>
+							<table class="tbl_agree">
+								<caption>개인정보 수집 및 활용 동의</caption>
+								<colgroup>
+									<col style="width:24%;">
+									<col style="width:86%;">
+								</colgroup>
+								<tbody>
+									<tr>
+										<th scope="row">구분</th>
+										<td>
+											<p>선택 항목</p>
+										</td>
+									</tr>
+									<tr>
+										<th scope="row">수집 항목</th>
+										<td>
+											<p>[ 마케팅 활용 동의 시 ]</p>
+											<p>- 고객 맞춤 상품/서비스 제공(상품/서비스/채널이용 내역), 신규 서비스 개발 및 마케팅 활용, 정기간행물 발송을 위한 성명, 생년월일, 성별, 배송주소, 이메일주소, 휴대전화번호</p>
+										</td>
+									</tr>
+									<tr>
+										<th scope="row">보유 기간</th>
+										<td>
+											<p>- 회원 탈퇴 후 30일까지 또는 해당 서비스 동의 철회시까지</p>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="choiceBox mgT20">
+								<p>[개인정보 수집 · 이용목적]</p>
+								<ol class="mgT5 list">
+									<li class="title">마케팅 활용 및 신규 서비스 개발(마케팅 활동 선택 동의 항목)</li>
+									<li>- 회원에 대한 맞춤형 서비스, 각종 편의서비스 및 혜택 제공</li>
+									<li>- 사은/판촉 행사 등 각종 이벤트 행사 관련 정보 안내</li>
+									<li>- 마케팅 및 서비스이용에 대한 분석작업(개별 및 집단 통계분석) 및 신규서비스 개발</li>
+									<li>- 제휴행사 및 서비스 홍보를 위한 마케팅 활용 및 제반 마케팅 활동</li>
+									<li>- 당사, 관계사 제공 상품 및 서비스 안내, 이벤트정보 및 참여기회 제공(SMS, 전자우편, DM , SNS 등), 앱설치 URL 전송 등</li>
+									<li>- 정기간행물의 발송</li>
+									<br>
+									<li>( * 마케팅 활용에 동의하지 않을 수 있지만, 미동의 시 해당 혜택을 받으실 수 없습니다.)</li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					<p class="txtbf13">동의하지 않으실 수 있으나, 개인정보 맞춤 관련 서비스 이용이 제한될 수 있습니다. [마이페이지>회원정보수정]에서 확인 및 동의 변경 가능</p>
+					<div class="txt_center">
+						<button type="button" class="btnGreen">동의</button>
+					</div>
+				</div>
+				<!-- //popCont 스크롤 영역 -->
+			</div>
+			<!-- //popContainer -->
+		</div>
+		<!-- //popInner -->
+	</div>
+	<!-- //popLayerArea -->
+</div>
+<!-- //#[3331722]큐레이션 영역 마케팅 활용 동의 수집 내용 변경 -->
+
+<!-- 전체메뉴 -->
+<div id="allMenu" class="allmenu" tabindex="0"><!--show-->
+	<div id="mLnb">
+
+		<!-- 개인화 정보 2016-12-07 star -->
+		<div class="intro">
+			<!--
+				2019-07-02 등급별 클래스 정의
+				gold / black / green / baby
+			-->
+			<span class="rank green">GREEN OLIVE</span>
+			<span class="name"><span class="ellipsis">일이삼사오</span><em>님</em></span>
+			<a class="setup" href="#none">설정</a>
+			<a class="notice new" href="#none"><em>N</em>알림</a>
+			<button type="button" class="allmenuClose btn-drawer-closer">전체 메뉴 닫기</button>
+		</div>
+		<!-- //개인화 정보 2016-12-07 end -->
+
+		<!-- 2017-03-10 코드수정 -->
+		<div class="shortcuts">
+			<button type="button" class="mypage">마이페이지</button>
+			<button type="button" class="order">주문/배송</button>
+			<button type="button" class="burial">매장안내</button>
+			<button type="button" class="customer">고객센터</button>
+		</div>
+		<!-- //2017-03-10 코드수정 -->
+		<!-- //바로가기 메뉴 end -->
+
+		<!-- 관심매장 등록 star -->
+		<div class="notice-list">
+			<div class="notice-type">
+				<p><strong>홍길동</strong> 님께서 등록하신<br>관심매장에 최근 행사공지가 없습니다.</p>
+				<button type="button" class="btnGrayH28">다른매장 소식보기</button>
+			</div>
+		</div>
+		<!-- //관심매장 등록 end -->
+
+		<!-- 공지사항 star -->
+		<div class="notice-area">
+			<a href="#none">
+				<span class="tit">공지사항</span><span class="txt">CJ ONE 시스템 정기 점검 안내  CJ ONE 시스템 정기 점검 안내CJ ONE 시스템 정기 점검 안내</span>
+			</a>
+		</div>
+
+		<div class="subLink">
+			<p class="mlink"><a href="#" class="new">프리미엄관</a></p>
+		</div>
+		<!-- //공지사항 end -->
+<!-- 2016-12-07 스크립트 수정 -->
+<script type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		$('.lnb_dep1 > li > a').click(function(){
+			if ($(this).parents('li').hasClass('on')){
+				$(this).parents().find('li').removeClass('on');
+			}else {
+				$(this).parents('li').addClass('on').siblings(".lnb_dep1 li").removeClass('on');
+				$('.lnb_dep2 li').removeClass('on');
+			}
+		});
+		$('.lnb_dep2 > li > a').click(function(){
+			if ($(this).parents('.lnb_dep2 li').hasClass('on')){
+				$(this).parents('.lnb_dep2 li').removeClass('on');
+			}else {
+				$(this).parents('.lnb_dep2 li').addClass('on').siblings('.lnb_dep2 li').removeClass('on');
+			}
+		});
+	});
+
+//]]>
+</script>
+<!-- //2016-12-07 스크립트 수정 -->
+		<!-- 2018-04-09 전시카테고리개편 -->
+		<div class="lnbSmenu">
+			<h2 class="lnb_head">카테고리</h2>
+			<div class="lnb_sec">
+				<ul class="lnb_dep1">
+					<li><a href="#;"><span class="new">스킨케어</span></a>
+						<ul class="lnb_dep2">
+							<li><a href="#;"><span class="new">페이셜케어</span></a>
+								<ul class="lnb_dep3">
+									<li><a href="#;"><span class="new">스킨/토너</span></a></li>
+									<li><a href="#;"><span>로션</span></a></li>
+									<li><a href="#;"><span>에센스/세럼</span></a></li>
+									<li><a href="#;"><span>크림</span></a></li>
+									<li><a href="#;"><span>미스트</span></a></li>
+									<li><a href="#;"><span>페이스오일</span></a></li>
+									<li><a href="#;"><span>아이크림/스팟케어</span></a></li>
+									<li><a href="#;"><span>남성올인원</span></a></li>
+									<li><a href="#;"><span>기획세트</span></a></li>
+								</ul>
+							</li>
+							<li><a href="#;"><span>마스크팩</span></a>
+								<ul class="lnb_dep3">
+									<li><a href="#;"><span>마스크팩1</span></a></li>
+									<li><a href="#;"><span>마스크팩2</span></a></li>
+								</ul>
+							</li>
+							<li><a href="#;"><span>클렌징</span></a></li>
+							<li><a href="#;"><span>선케어</span></a></li>
+							<li><a href="#;"><span>더모코스메틱</span></a></li>
+						</ul>
+					</li>
+					<li><a href="#;"><span>메이크업</span></a>
+						<ul class="lnb_dep2">
+							<li><a href="#;"><span>베이스 메이크업</span></a>
+								<ul class="lnb_dep3">
+									<li><a href="#;"><span>메이크업1</span></a></li>
+									<li><a href="#;"><span>메이크업2</span></a></li>
+									<li><a href="#;"><span>메이크업3</span></a></li>
+								</ul>
+							</li>
+							<li><a href="#;"><span>아이 메이크업</span></a></li>
+							<li><a href="#;"><span>메이크업세트</span></a></li>
+							<li><a href="#;"><span>립 메이크업</span></a></li>
+							<li><a href="#;"><span>네일 케어</span></a></li>
+						</ul>
+					</li>
+					<li><a href="#;"><span>바디케어</span></a>
+						<ul class="lnb_dep2">
+							<li><a href="#;"><span>로션/크림</span></a>
+								<ul class="lnb_dep3">
+									<li><a href="#;"><span>로션/크림1</span></a></li>
+								</ul>
+							</li>
+							<li><a href="#;"><span>워시/스크럽</span></a></li>
+							<li><a href="#;"><span>미스트/오일</span></a></li>
+							<li><a href="#;"><span>핸드/풋</span></a></li>
+							<li><a href="#;"><span>립케어</span></a></li>
+							<li><a href="#;"><span>데오/제모</span></a></li>
+						</ul>
+					</li>
+					<li><a href="#;"><span>헤어케어</span></a></li>
+					<li><a href="#;"><span>향수/디퓨져</span></a></li>
+					<li><a href="#;"><span>미용소품</span></a></li>
+					<li><a href="#;"><span>남성</span></a></li>
+					<li><a href="#;"><span>건강/위생용품</span></a></li>
+					<li><a href="#;"><span>건강식품</span></a></li>
+					<li><a href="#;"><span>일반식품</span></a></li>
+					<li><a href="#;"><span>반려동물</span></a></li>
+					<li><a href="#;"><span>베이비</span></a></li>
+					<li><a href="#;"><span>잡화</span></span></a></li>
+				</ul>
+			</div>
+
+		</div>
+		<!-- //lnbSmenu -->
+
+		<!-- 올리브영 전문관 2016-12-22 수정(li안 a태그 두개씩) -->
+		<!-- 올리브영 전문관 2016-12-07 star -->
+		<div class="lnb-jeonmungwan">
+			<h2>올리브영 전문관</h2>
+			<ul>
+				<li>
+					<a href="#">프리미엄 전문매장</a>
+					<a href="#">맘 &amp; 베이비</a>
+				</li>
+				<li>
+					<a href="#">남성관</a>
+					<a href="#">다이어트&amp;헬스</a>
+				</li>
+				<li>
+					<a href="#">FOOD</a>
+					<a href="#">LIVNG</a>
+				</li>
+				<li>
+					<a href="#">향초 전문관</a>
+					<a href="#">펫샵</a>
+				</li>
+				<li>
+					<a href="#">전문관 풀네임 전문관 풀네임</a>
+					<a href="#">&nbsp;</a>
+				</li>
+			</ul>
+		</div>
+		<!-- //올리브영 전문관 2016-12-07 end -->
+		<!-- //올리브영 전문관 2016-12-22 수정 -->
+
+		<!-- 최근 본 상품 2016-12-07 상품 마크업 전체 수정 star -->
+		<div class="late-conts">
+			<h2>최근 본 상품</h2>
+			<ul class="mlist3v-goods">
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_02.png" alt="">
+							<span class="soldOut">품절</span></span><!-- //2016-12-22 추가  품절 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+					<button type="button" class="jeem">찜하기</button>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_02.png" alt="">
+							<span class="soldOut">품절</span></span><!-- //2016-12-22 추가  품절 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+					<button type="button" class="jeem">찜하기</button>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_02.png" alt="">
+							<span class="soldOut">품절</span></span><!-- //2016-12-22 추가  품절 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+					<button type="button" class="jeem">찜하기</button>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_01.png" alt="">
+							<span class="allsoldOut">판매종료</span><!-- //2016-12-22 추가 판매 종료 시 노출// -->
+						</span>
+						<span class="txtus finish"><!--- //2016-12-22 추가 판매종료 시 finish 클래스 추가 // -->
+							<span class="tit">닥터자르트</span>
+							<span class="txt">세라마이딘 마스크</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_02.png" alt="">
+							<span class="soldOut">품절</span></span><!-- //2016-12-22 추가  품절 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+					<button type="button" class="jeem">찜하기</button>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<span class="minor">성인인증이 필요합니다.</span><!-- //2016-12-22 추가 성인인증 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+				</li>
+			</ul>
+			<a class="btnMore" href="#">상품 더보기</a>
+		</div>
+		<!-- //최근 본 상품 상품 마크업 전체 수정 end -->
+
+		<!--  star -->
+		<!-- // end -->
+	</div>
+	<button type="button" class="allmenuClose">전체 메뉴 닫기</button>
+</div>
+<div class="dim" style="z-index:15"></div>
+
+</div>
+<!--//전체메뉴 끝-->
+<script type="text/javascript">
+//<![CDATA[
+$(document).ready(function(){
+	//드로어 메뉴 기본 동작 @common.js
+	$("#footerTabCategoy").click(function() {
+		$(".allmenuClose").click(function() {
+			// 타이틀영역 숨기기
+			$("#titConts").show();
+
+			var scollH = $(".allmenu div").scrollTop();
+			if (scollH > 0) {
+				$(".allmenu div").scrollTop(0.0)
+			}
+			$(".allmenu").stop().animate({
+				left : '-100%'
+			}, 200).delay(2000).parents("body").css({
+				"overflow" : "visible"
+			});
+			setTimeout(function() {
+				$(".allmenu").removeClass("show");
+			}, 150);
+
+			$(".dim").hide();
+
+			// 웹 접근성 popfocus 삭제 ( 2017-05-11 )
+			$("a[data-focus~=on]").focus(); // 표시해둔 곳으로 초점 이동
+			window.setTimeout(function() {
+				$("a[data-focus~=on]").removeAttr("data-focus");
+			}, 100); // 
+
+			// 앱 호출
+			setTimeout(function() {
+				// common.app.callMenu("N");
+			}, 100);
+		});
+		
+		// 타이틀영역 숨기기
+		$("#titConts").hide();
+
+		var num = $(".allmenu").hasClass("show");
+
+		if (!num) {
+			// common.setLazyLoad();
+			$(".allmenu").addClass("show").stop().animate({
+				left : 0
+			}, 240).parents("body").css({
+				"overflow" : "hidden"
+			});
+			$(".dim").show();
+			// 앱 호출
+			// setTimeout(function() {
+			//	 common.app.callMenu("Y");
+			// }, 100);
+
+			// if (common.app.appInfo.isapp) {
+			// 	// 앱일 경우 새로운 푸시 있는지 확인하는 스킴 호출
+			// 	location.href = "oliveyoungapp://getpushnewmsgyn";
+			// }
+		} else {
+			$(".allmenu").removeClass("show").stop().animate({
+				left : '-85%'
+			}, 200).parents("body").css({
+				"overflow" : "visible"
+			});
+			$(".dim").hide();
+			// 앱 호출
+			// setTimeout(function() {
+			// 	common.app.callMenu("N");
+			// }, 100);
+		}
+		
+		// setTimeout(function() {
+		// 	common.gnb.bindSlideMenu();
+		// }, 200);
+		
+		// //최근 본 상품
+		// setTimeout(function() {
+		// 	try {
+		// 		common.recentGoods.init();
+		// 	} catch (e) {
+		// 	}
+		// }, 300);
+	});
+});
+//]]>
+</script>
+
+
+
+<!-- popLayerWrap -->
+<div class="popLayerWrap typeUi" id="touchLogin"><!-- //id값 임의, display:none; default 지정// -->
+	<!-- popLayerArea -->
+	<div class="popLayerArea">
+		<!-- popInner -->
+		<div class="popInner">
+			<!-- popContainer -->
+			<div class="popContainer">
+				<!-- popCont 스크롤 영역 -->
+				<div class="popCont">
+					<div class="alertUi">
+						<h2 class="tit">안내</h2>
+						<p class="txt_base">다음 로그인 시 Touch ID 로그인을 <br>사용하시겠습니까?</p>
+						<p class="txt_check"><input type="checkbox" id="noAgain"><label for="noAgain">다시보지 않기</label></p>
+						<ul class="btn_type2">
+							<li><button type="button" onclick="popLayerClose('touchLogin');return false;">아니오</button></li>
+							<li><button type="button" onclick="setTouch();return false;">예</button></li>
+						</ul>
+					</div>
+				</div>
+				<!-- //popCont 스크롤 영역 -->
+			</div>
+			<!-- //popContainer -->
+		</div>
+		<!-- //popInner -->
+	</div>
+	<!-- //popLayerArea -->
+</div>
+<!-- //popLayerWrap -->
+
+<div class="txt_fixed" id="txt_fixed">
+	<div class="inner">
+		<p class="txt">올리브영 계정으로 Touch ID 로그인이 활성화 되었습니다.</p>
+	</div>
+</div>
+
+<!-- ↓ 배너 전체 보기 -->
+<div id="show-all-banner">
+	<div class="sab-header">
+		전체보기<span class="length">(4)</span>
+		<button class="hide-all-banner">닫기</button>
+	</div>
+	<div class="sab-body">
+		<ul class="ix-list-items">
+			<li class="ix-list-item">
+				<a href="#n">
+					<div class="thum"><img class="" src="http://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/180039369180675682.jpg"></div>
+					<div class="dec">
+						<p class="txt">1나를 빛내줘~ 올리브영!<br>트윙클 할로윈</p>
+						<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+					</div>
+				</a>
+			</li>
+			<li class="ix-list-item">
+				<a href="#n">
+					<div class="thum"><img class="" src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/6767022671105612523.jpg"></div>
+					<div class="dec">
+						<p class="txt">2나를 빛내줘~ 올리브영!<br>트윙클 할로윈</p>
+						<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+					</div>
+				</a>
+			</li>
+			<li class="ix-list-item">
+				<a href="#n">
+					<div class="thum"><img class="" src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/5981228611284235290.jpg"></div>
+					<div class="dec">
+						<p class="txt">3나를 빛내줘~ 올리브영!<br>트윙클 할로윈</p>
+						<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+					</div>
+				</a>
+			</li>
+			<li class="ix-list-item">
+				<a href="#n">
+					<div class="thum"><img class="" src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/2837028763006609114.jpg"></div>
+					<div class="dec">
+						<p class="txt">4나를 빛내줘~ 올리브영!<br>트윙클 할로윈</p>
+						<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+					</div>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<!-- ↑ 배너 전체 보기 -->
+
+<div class="oyFullLayer layer-allalain" id="layer-allalain">
+	<div class="oyLayerContainer">
+		<div class="oyHead">
+			<h1 class="tit">전체보기</h1>
+			<button type="button" class="btnPrev">뒤로가기</button>
+			<button type="button" class="btnClose">닫기</button>
+		</div>
+		<div class="oyTabs">
+			<a href="#" class="oyTab active" data-oytab-target="0">
+				올알랭 가이드
+				<span class="num">(999)</span>
+			</a>
+			<a href="#" class="oyTab" data-oytab-target="1">
+				리뷰의 품격
+				<span class="num">(16)</span>
+			</a>
+		</div>
+		<!-- ↓ 올알랭가이드 탭 컨텐츠 -->
+		<div class="oyContents oyTabContents active" data-oytab-idx="0">
+			<div class="oyCont">
+				<div class="filter">
+					<select name="" id="">
+						<option value="">전체년도</option>
+						<option value="2020">2020</option>
+						<option value="2020">2019</option>
+					</select>
+					<select name="" id="">
+						<option value="">전체 월</option>
+						<option value="1">1</option>
+						<option value="1">2</option>
+						<option value="1">12</option>
+					</select>
+				</div>
+				<!-- 썸네일 가져오기 https://img.youtube.com/vi/video-id/0.jpg -->
+				<ul class="video-list">
+					<li>
+						<a href="#" data-video-id="kJWYhp_b1D0">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/kJWYhp_b1D0/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">이렇게 안 번져도 😲 되나싶은 올리브영 펜슬 아이라이너 TOP 3</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 13,507회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#" data-video-id="NIJSqt2HfnU">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/NIJSqt2HfnU/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍂거칠어진 내 피부를 🍯꿀피부로 만들어 줄 올리브영 바디필링 TOP 5(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 61,364회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#" data-video-id="FrNHl2jFTgE">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/FrNHl2jFTgE/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">이렇게 안 번져도 되나😲 싶은 올리브영 펜슬아이라이너 TOP3(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 49,049회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/7iMc1X0OyvY/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">살은 빼고 싶지만 간식 못 잃어😭🍫🍰 저칼로리 간식TOP5(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 18,908회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/NyS0FlWKpts/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">안 사면 나만 손해🙊올리브영에서 꼭 사야하는 세럼 TOP5(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 54,299회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/E11HI7R8oIk/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">💥섭외대성공💥조회수 240만 알바생 성대모사 유튜버 드디어 모셨습니다🔥(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 18</span>
+									<span class="v-view">조회수 120,254회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/zO0sFIeiPxU/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP5🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/DhAPFnlT2GM/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP100🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/X68lVgY3MQI/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">올리브영이 추천하는 클린뷰티 TOP200🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/EuRmAuT7cGM/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP300🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/_kasJkhXB5A/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP400🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/IMUX5YKWXcA/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP500🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2019. 8. 14</span>
+									<span class="v-view">조회수 1,100,089,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					
+				</ul>
+				<button type="button" class="btn-load-more">더보기</button>
+			</div>
+		</div>
+		<!-- ↓ 리뷰의품격 탭 컨텐츠 -->
+		<div class="oyContents oyTabContents" data-oytab-idx="1">
+			<div class="oyCont">
+				<!-- 썸네일 가져오기 https://img.youtube.com/vi/video-id/0.jpg -->
+				<ul class="video-list">
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/kJWYhp_b1D0/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">이렇게 안 번져도 😲 되나싶은 올리브영 펜슬 아이라이너 TOP 3</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 13,507회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/NIJSqt2HfnU/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍂거칠어진 내 피부를 🍯꿀피부로 만들어 줄 올리브영 바디필링 TOP 5(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 61,364회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/FrNHl2jFTgE/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">이렇게 안 번져도 되나😲 싶은 올리브영 펜슬아이라이너 TOP3(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 49,049회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/7iMc1X0OyvY/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">살은 빼고 싶지만 간식 못 잃어😭🍫🍰 저칼로리 간식TOP5(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 18,908회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/NyS0FlWKpts/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">안 사면 나만 손해🙊올리브영에서 꼭 사야하는 세럼 TOP5(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 9. 16</span>
+									<span class="v-view">조회수 54,299회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/E11HI7R8oIk/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">💥섭외대성공💥조회수 240만 알바생 성대모사 유튜버 드디어 모셨습니다🔥(이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 18</span>
+									<span class="v-view">조회수 120,254회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/zO0sFIeiPxU/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP5🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/DhAPFnlT2GM/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP100🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/X68lVgY3MQI/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">올리브영이 추천하는 클린뷰티 TOP200🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/EuRmAuT7cGM/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP300🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/_kasJkhXB5A/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP400🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2020. 8. 14</span>
+									<span class="v-view">조회수 9,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<div class="v-thumb">
+								<img src="https://img.youtube.com/vi/IMUX5YKWXcA/0.jpg" alt="영상 미리보기">
+							</div>
+							<div class="v-desc">
+								<p class="v-title">🍯서윗다정한 올리브영이 추천하는 클린뷰티 TOP500🧚 (이벤트)</p>
+								<p class="v-info">
+									<span class="v-date">2019. 8. 14</span>
+									<span class="v-view">조회수 1,100,089,443회</span>
+								</p>
+							</div>
+						</a>
+					</li>
+					
+				</ul>
+			</div>
+		</div>
+		<!-- ↓ 비디오 상세 -->
+		<div class="oyContents oyInnerContents">
+			<div class="allalain">
+				<!--↓ 영상 제목 -->
+				<div class="v-desc">
+					<p class="v-title">🍂거칠어진 내 피부를 🍯꿀피부로 만들어 줄 올리브영 바디필링 살은 빼고 싶지만 간식 못 잃어😭🍫🍰 저칼로리 간식TOP5(이벤트)</p>
+					<p class="v-info">
+						<span class="v-date">2020. 9. 16</span>
+						<span class="v-view">조회수 61,364회</span>
+					</p>
+				</div>
+
+				<!-- ↓ 영상 -->
+				<div id="yt-player2"></div>
+
+				<h4 class="tit-allalain-s">컨실러 1위 ~ 2위</h4>
+				<div class="prd-cont active">
+
+					<!-- ↓ item -->
+					<div class="prd-item">
+						<div class="prd-thumb">
+							<img src="https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0013/A00000013778701ko.jpg?l=ko" alt="@썸네일">
+							<button type="button" class="time-stamp" data-timeline="93">01:33</button>
+						</div>
+						<div class="prd-detail">
+							<a href="#" class="prd-link">
+								<strong class="prd-brand">올리브영</strong>
+								<span class="prd-name">쉬즈라인 겨드랑이 땀패드(5쌍) 남녀 공용 겨드랑이 패드 옷 얼룩짐 방지 슬림한 두께감</span>
+							</a>
+							<div class="price-wrap">
+								<a href="#">
+									<span class="strike">53,000<span class="won">원</span></span>
+									<strong class="price">832,000원</strong>
+								</a>
+								<button type="button" class="prd-cart">장바구니</button>
+							</div>
+						</div>
+					</div>
+					<!-- ↑ item -->
+
+					<h5 class="tit-allalain-ss">함께쓰면 좋을 꿀 조합템</h5>
+					<div class="addon">
+
+						<!-- ↓ item -->
+						<div class="prd-item">
+							<a href="#" class="prd-thumb">
+								<img src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/139/3242182483914317772.jpg" alt="@썸네일">
+							</a>
+							<div class="prd-detail">
+								<a href="#" class="prd-link">
+									<strong class="prd-brand">보타닉힐보 아이디얼포맨</strong>
+									<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝 멀티 태스커 파운데이션 미니 메이크업</span>
+								</a>
+							</div>
+						</div>
+						<!-- ↑ item -->
+
+						<!-- ↓ item -->
+						<div class="prd-item">
+							<a href="#" class="prd-thumb">
+								<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+							</a>
+							<div class="prd-detail">
+								<a href="#" class="prd-link">
+									<strong class="prd-brand">불독</strong>
+									<span class="prd-name">미니 파운데이션</span>
+								</a>
+							</div>
+						</div>
+						<!-- ↑ item -->
+
+					</div>
+				</div>
+
+				<div class="prd-cont">
+					<!-- ↓ item -->
+					<div class="prd-item">
+						<div class="prd-thumb">
+							<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+							<button type="button" class="time-stamp" data-timeline="615">10:15</button>
+						</div>
+						<div class="prd-detail">
+							<a href="#" class="prd-link">
+								<strong class="prd-brand">보타닉힐보 아이디얼포맨</strong>
+								<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝 멀티 태스커 파운데이션 미니 메이크업</span>
+							</a>
+							<div class="price-wrap">
+								<a href="#">
+									<span class="strike">53,000<span class="won">원</span></span>
+									<strong class="price">832,000원</strong>
+								</a>
+								<button type="button" class="prd-cart">장바구니</button>
+							</div>
+						</div>
+					</div>
+					<!-- ↑ item -->
+				</div>
+
+				<h4 class="tit-allalain-s">쿠션부문 1위</h4>
+
+				<div class="prd-cont">
+					<!-- ↓ item -->
+					<div class="prd-item">
+						<div class="prd-thumb">
+							<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+							<button type="button" class="time-stamp" data-timeline="305">05:05</button>
+						</div>
+						<div class="prd-detail">
+							<a href="#" class="prd-link">
+								<strong class="prd-brand">웨이크메이크</strong>
+								<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝</span>
+							</a>
+							<div class="price-wrap">
+								<a href="#">
+									<span class="strike">53,000<span class="won">원</span></span>
+									<strong class="price">832,000원</strong>
+								</a>
+								<button type="button" class="prd-cart">장바구니</button>
+							</div>
+						</div>
+					</div>
+					<!-- ↑ item -->
+				</div>
+
+				<h4 class="tit-allalain-s">파운데이션부문 1위</h4>
+
+				<div class="prd-cont">
+					<!-- ↓ item -->
+					<div class="prd-item">
+						<div class="prd-thumb">
+							<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+							<button type="button" class="time-stamp" data-timeline="361">06:01</button>
+						</div>
+						<div class="prd-detail">
+							<a href="#" class="prd-link">
+								<strong class="prd-brand">웨이크메이크</strong>
+								<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝</span>
+							</a>
+							<div class="price-wrap">
+								<a href="#">
+									<span class="strike">53,000<span class="won">원</span></span>
+									<strong class="price">832,000원</strong>
+								</a>
+								<button type="button" class="prd-cart">장바구니</button>
+							</div>
+						</div>
+					</div>
+					<!-- ↑ item -->
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+
+
+// 2020-10-16 올알랭 전체보기 레이어 "마크업 확인용" 스크립트 입니다.
+let alllayer = $("#layer-allalain"),
+	alllHead = alllayer.find(".oyHead"),
+	tabCont = alllayer.find(".oyTabContents"),
+	innCont = alllayer.find(".oyInnerContents"),
+	ytPlayer = innCont.find("#yt-player2");
+// 목록에서 상세로
+tabCont.find(".video-list li a").on({
+	click: function(e){
+		e.preventDefault();
+		alllayer.addClass("expand");
+		if ( $(this).attr("data-video-id") ) {
+			changeVideo($(this).attr("data-video-id"));
+		};
+		//타임스탬프
+		let btnTimeStamp = innCont.find(".time-stamp");
+		btnTimeStamp.on("click touch", function(){
+			let seekto = $(this).attr("data-timeline");
+			if ( seekto ) {
+				player2.seekTo(seekto, true);
+			} else {
+				if ( !YT.PlayerState.PLAYING ) {
+					player2.playVideo();
+				};
+			};
+		});
+	}
+});
+// 백버튼 (상세에서 목록으로)
+alllHead.find(".btnPrev").on({
+	click: function(e){
+		e.preventDefault();
+		alllayer.removeClass("expand");
+		innCont.scrollTop(0);
+		tabCont.filter(".active").scrollTop(0);
+		player2.stopVideo();
+	}
+});
+// 닫기버튼
+alllHead.find(".btnClose").on({
+	click: function(e){
+		e.preventDefault();
+		if ( alllayer.hasClass("expand") ) alllayer.removeClass("expand");
+		common.oyFullClose('alllayer');
+		player2.stopVideo();
+	}
+});
+
+</script>
+
+</body>
+</html>

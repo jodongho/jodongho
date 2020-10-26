@@ -1,0 +1,25 @@
+@charset "utf-8";
+/* 기본 */
+.oliveyoung{width:100%;}
+.oliveyoung .tit{overflow:hidden;zoom:1;background:#565656;margin:0 0 3px;}
+.oliveyoung .tit h1{float:left;}
+.oliveyoung .tit span{display:block;float:right;}
+.oliveyoung .data{text-align:left;padding:47px 25px 34px;text-align:left;}
+.oliveyoung .data h2{line-height:21px;font-size:16px;font-weight:bold;padding:0 0 0 2px;color:#f3783d;}
+.oliveyoung .data p{padding:0 0 0 2px;line-height:16px;}
+.oliveyoung .data h3{margin:28px 0 8px;font-size:16px;font-weight:bold;}
+.oliveyoung .data h3 span{display:inline-block;height:21px;padding:5px 10px 0 10px;background:#565656;color:#fff;}
+
+/* 이미지 여백 */
+.oliveyoung .data .imgBox01{padding:34px 0 15px;}
+.oliveyoung .data .imgBox02{padding:29px 0 0;}
+
+/*사용시 주의사항 */
+.oliveyoung .attention{text-align:left;background:#aebe51;padding:10px 7px 7px;margin:34px 0 0;}
+.oliveyoung .attention h3{height:31px;margin:0;}
+.oliveyoung .attention .attentionTxt{background:#fff;padding:12px 14px 10px;}
+.oliveyoung .attention ol li{padding:0 0 16px;}
+.oliveyoung .attention ol li ul{padding:0 0 0 4px;}
+.oliveyoung .attention ol li ul li{padding:0;}
+.oliveyoung .attention ol, .oliveyoung .attention ul, .oliveyoung .attention li{list-style:none}
+.oliveyoung .attention img{width:auto}

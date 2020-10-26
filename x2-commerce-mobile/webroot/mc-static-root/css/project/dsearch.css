@@ -1,0 +1,57 @@
+@charset "utf-8";
+/*2차*/
+.related_list{overflow:hidden;padding-left:20px;background:#fff;border-bottom:1px solid #e5e5e5;}
+.related_list:last-child{border-bottom:5px solid #e5e5e5;}
+.related_list .list_title{color:#000;font-weight:500;font-size:15px;letter-spacing:0;vertical-align:middle;font-family:'NotoSansKR';}
+.related_list ul{display:-webkit-box;width:100%;height:45px;white-space:nowrap;}
+.related_list ul li{position:relative;padding:10px 15px 10px 0;}
+.related_list ul li, .related_list ul a{color:#9bce26;font-weight:500;font-size:15px;letter-spacing:0;vertical-align:middle;font-family:'NotoSansKR';}
+.related_list.scroll_wrap{border-color:#eee;}
+.related_list.scroll_wrap .list_title, .related_list.scroll_wrap .list{float:left;}
+.related_list.scroll_wrap .list_title{padding:11.5px 0;width:45px;}
+.related_list.scroll_wrap .list_wrap{overflow:scroll;width:calc(100% - 45px);-ms-overflow-style:none;scrollbar-width:none;}
+.related_list.scroll_wrap .list_wrap::-webkit-scrollbar{display:none;}
+.related_list.menu{border-color:#eee;}
+.related_list.menu .list_title, .related_list.menu .list{float:left;}
+.related_list.menu .list_title{padding:11.5px 0;width:70px;font-weight:bold;font-size:14px;}
+.related_list.menu .list_wrap{overflow:scroll;width:calc(100% - 70px);-ms-overflow-style:none;scrollbar-width:none;}
+.related_list.menu .list_wrap::-webkit-scrollbar{display:none;}
+.related_list.menu .list input{display:none;}
+.related_list.menu .list input + label{color:#555;font-size:14px;}
+.related_list.menu .list input:checked + label{color:#9bce26;}
+.related_list.menu .list a{color:#555;font-size:14px;}
+
+.midCateArea.type3.dsearch_result_list{border-bottom:solid 1px #ddd;font-family:'NotoSansKR';height:50px;line-height:45px;position:sticky;top:60px;z-index:6;}
+.midCateArea.type3.dsearch_result_list.list_Fixed{position:fixed;top:61px;z-index:10;width:100%;}
+.midCateArea.type3.dsearch_result_list .search_results{padding-left:20px;width:88px;line-height:50px;font-size:14px;color:rgba(0, 0, 0, 0.85);}
+.midCateArea.type3.dsearch_result_list .search_results span.data{margin-left:5px;font-size:14px;color:rgba(0, 0, 0, 0.85);}
+.midCateArea.type3.dsearch_result_list .search_results:after{margin:0 0px 4px 10px;content:"";display:inline-block;width:AUTO;height:12px;border:solid 1px #dddddd;vertical-align:middle;}
+.midCateArea.type3.dsearch_result_list .check_today{float:left;width:100px;}
+.midCateArea.type3.dsearch_result_list .check_today input[type="checkbox"].chkSmall{margin:0 0 0 2px;transform:scale(0.74);}
+.midCateArea.type3.dsearch_result_list .check_today input[type="checkbox"].chkSmall + label{font-size:14px;color:#888;}
+.midCateArea.type3.dsearch_result_list .check_today input[type="checkbox"].chkSmall + label:before{content:"";display:inline-block;width:20px;height:18px;vertical-align:middle;background-image:url(/mc-static-root/image/comm/delivery.png);background-repeat:no-repeat;background-position:50% 0;background-size:17px;}
+.midCateArea.type3.dsearch_result_list .check_today input[type="checkbox"].chkSmall:checked + label{color:#e95294;}
+.midCateArea.type3.dsearch_result_list .check_today input[type="checkbox"].chkSmall:checked + label:before{background-image:url(/mc-static-root/image/comm/delivery_color.png);}
+.midCateArea.type3.dsearch_result_list .check_today img{margin:1px 2.5px 0 0;width:17px;}
+.midCateArea.type3.dsearch_result_list .prdSoting{padding:0 10px;float:right;border:solid 1px #ccc;border-radius:5px;width:104px;height:30px;color:#000;font-size:12px;letter-spacing:0;background:#fff url(/mc-static-root/image/etc/ico_arrowDV_off.png) no-repeat 90% center;background-size:7px;}
+.midCateArea.type3.dsearch_result_list .prdSoting_wrap{margin-top:9px;float:right;}
+/* 검색결과 상단 기획전 배너 */
+.mlist-mSearches{overflow:hidden;border-bottom:1px solid #f5f5f5;}
+.mlist-mSearches .banner_plan{display:block;overflow:hidden;margin:15px 20px;color:#333;border-radius:8px;background:#f5f5f5;}
+.mlist-mSearches .banner_plan>.inner{position:relative;max-width:400px;margin:0 auto;padding:17px 80px 14px 20px;background:url(/mc-static-root/image/etc/banner_srch_rslt.png) no-repeat calc(100% + 9px) 100%;background-size:94px 45px}
+.mlist-mSearches .banner_plan span,
+.mlist-mSearches .banner_plan p{letter-spacing:0;word-spacing:0}
+.mlist-mSearches .banner_plan p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mlist-mSearches .banner_plan .flag{position:absolute;right:20px;top:15px;min-width:40px;padding:1px 3px;text-align:center;font-size:11px;line-height:1.13;border:1px solid #333;border-radius:5px;background-color:rgba(255, 255, 255, 0.6);}
+.mlist-mSearches .banner_plan .copy1{font-weight:500;font-size:15px;line-height:1.13;}
+.mlist-mSearches .banner_plan .copy2{margin-top:4px;font-size:13px;line-height:1.15;}
+@media screen and (max-width: 359px) {
+	.mlist-mSearches .banner_plan>.inner{padding-left:10px;padding-right:60px;}
+	.mlist-mSearches .banner_plan .flag{right:10px;}
+}
+@media screen and (min-width: 442px) {
+    .mlist-mSearches .banner_plan>.inner{background-position-x:100%;}
+}
+@supports (-webkit-hyphens:none) {
+	.mlist-mSearches .banner_plan .flag{padding:0 3px 2px;}
+}

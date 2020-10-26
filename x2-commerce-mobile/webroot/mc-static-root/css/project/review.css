@@ -1,0 +1,28 @@
+@charset "utf-8";
+/* start:  10/13 contents.css에 반영 배포에는  상품상세 2차 배포시에는 product.css로 옮기고 삭제 필요 */
+
+/*리뷰고도화*/
+/* .my_new_profile.reviewN2 .thum,
+.my_new_profile.renewN2 .thum{position: absolute;top: 50%;transform: translateY(-50%);height:auto;margin-top:0;}
+.my_new_profile.reviewN2 .info,
+.my_new_profile.renewN2 .info{min-height: 65px;padding:0 0 0 75px;}
+.my_new_profile.reviewN2,
+.my_new_profile.renewN2{padding: 15px 20px;} */
+
+.my_new_profile.reviewN2,
+.my_new_profile.renewN2{display:flex;display:-ms-flexbox;display:-webkit-flex;align-items:center;-webkit-align-items: center;padding:0 0 0 10px;}
+.my_new_profile.reviewN2 .thum,
+.my_new_profile.renewN2 .thum{margin-top:0;}
+.my_new_profile.reviewN2 .info,
+.my_new_profile.renewN2 .info{padding:0 0 0 10px;}
+.my_new_profile.reviewN2,
+.my_new_profile.renewN2{padding: 15px 20px;}
+
+
+
+
+
+
+
+
+

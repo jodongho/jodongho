@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+    <g fill="none" fill-rule="evenodd">
+        <g>
+            <g transform="translate(-250 -21) translate(250 21)">
+                <circle cx="10.752" cy="9.975" r="7.125" fill="#FFF" stroke="#E02020" stroke-width=".95"/>
+                <path fill="#E02020" d="M10.277 5.7H11.277V10.45H10.277z"/>
+                <path fill="#E02020" d="M10.277 9.5H14.076999999999998V10.5H10.277z"/>
+                <path fill="#E02020" d="M6.65 4.448c0-1.574-1.276-2.85-2.85-2.85S.95 2.874.95 4.448h5.7z" transform="rotate(-45 3.8 3.023)"/>
+                <path fill="#E02020" d="M20.539 4.448c0-1.574-1.276-2.85-2.85-2.85s-2.85 1.276-2.85 2.85h5.7z" transform="scale(-1 1) rotate(-45 0 45.728)"/>
+            </g>
+        </g>
+    </g>
+</svg>

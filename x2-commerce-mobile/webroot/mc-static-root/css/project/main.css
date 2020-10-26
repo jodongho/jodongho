@@ -1,0 +1,220 @@
+@charset "utf-8";
+/* 삭제요망한것 */
+.prod-list.v1 .prod-info>a{padding:0;}
+/* 2020-08-12 상품카드 UI 개선 */
+.prod-list{background-color:#fff;}
+.prod-list a,
+.prod-list span,
+.prod-list strong,
+.prod-list p{vertical-align:0;font-weight:inherit;font-size:inherit;letter-spacing:0;color:inherit;}
+.prod-list .thumb{display:block;position:relative;}
+.prod-list .thumb::before{content:"";position:absolute;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.03);}
+.prod-list .pic-thumb{object-fit:contain;width:100%;height:100%;}
+.prod-list .appeal{position:absolute;left:0;bottom:0;width:100%;padding:4px;text-align:center;font-size:12px;line-height:1.167em;color:#333;background:rgba(0,0,0,0.05)}	/* 미확정 요소 */
+.prod-list .flag-badge{position:absolute;left:5px;top:5px;width:3.4em;height:3.4em;padding:1.1em 0;text-align:center;white-space:nowrap;font-weight:700;font-size:10px;line-height:1.2em;letter-spacing:-0.02em;color:#fff;background-color:#ffffffcc;}
+.prod-list .flag-badge.best{background-color:#f27270cc;}
+.prod-list .flag-badge.new{background-color:#00b4aacc;}
+.prod-list .flag-badge.oneday{background-color:#b40096cc;}
+.prod-list .flag-badge.event{background-color:#48b400cc;}
+.prod-list .prod-info{position:relative;}
+.prod-list .prod-info>a{display:block;}
+.prod-list .brand{min-height:20px;padding:3px 0;font-size:11px;}
+.prod-list .exclusive{margin-right:1px;font-weight:500;line-height:1.182em;color:#9bce26;}
+.prod-list .brand-name{display:inline-block;line-height:1.182em;letter-spacing:-0.0164em;color:#333;}
+.prod-list .prod-name{display:block;margin:2px 0 6px;font-weight:500;font-size:13px;line-height:1.231em;letter-spacing:-0.0154em;color:#333;}
+.prod-list .discount{margin:6px 0 2px;font-size:12px;line-height:1.167em;}
+.prod-list .rate-of{font-weight:700;color:#e02020;}
+.prod-list .origin{text-decoration:line-through;color:#888;}
+.prod-list .price{margin:2px 0 4px;font-weight:500;}
+.prod-list .total{font-size:17px;line-height:1.118em;color:#000;}
+.prod-list .total .won{font-size:15px;line-height:1.267em;}
+.prod-list .price .oneday{display:inline-block;padding:4px 0 3px 15px;vertical-align:1px;font-size:10px;line-height:1.2em;color:#e95294;background:url('/mc-static-root/image/svg/oneday.svg') no-repeat 0 50%;}
+.prod-list .rating{margin:4px 0 6px;font-size:11px;line-height:1.182em;}
+.prod-list .point{padding-left:13px;color:#555;background:url('/mc-static-root/image/svg/star.svg') no-repeat 0 50%;}
+.prod-list .num{color:#888;}
+.prod-list .cart{background:url('/mc-static-root/image/svg/cart.svg') no-repeat 50%;}
+.prod-list .flags{overflow:hidden;margin-top:6px;}
+.prod-list .flag{float:left;margin:0 2px 2px 0;padding:2px 4px;font-size:10px;line-height:1.1em;color:#666;border:1px solid #666;border-radius:0.2em;}
+.prod-list .flag.present,
+.prod-list .flag.plus{color:#f7a341;border-color:#f7a341;}
+.prod-list .flag.sale{color:#f27370;border-color:#f27370;}
+.prod-list .flag.coupon{color:#9bce26;border-color:#9bce26;}
+.prod-list .flag.gift{color:#64c8f2;border-color:#64c8f2;}
+.prod-list .flag.free{color:#ad85ec;border-color:#ad85ec;}
+.prod-list .prod-func{position:absolute;z-index:3;}
+.prod-list .prod-func button{width:20px;height:20px;font-size:0;color:transparent;border-radius:2px;}
+.prod-list .prod-func button:focus,
+.prod-list .prod-func button:active{border:0;}
+.prod-list .prod-func button:active{background-color:#9bce2630;}
+.prod-list .prod-func button+button{margin-left:8px;}
+.prod-list .favorite{background:url('/mc-static-root/image/svg/heart.svg') no-repeat 50%;}
+.prod-list .favorite.mClick{background-image:url('/mc-static-root/image/svg/heart-fill.svg');}
+.prod-list .single-line{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.prod-list .double-line,
+.prod-list .triple-line{display:-webkit-box;overflow:hidden;text-overflow:ellipsis;-webkit-box-orient:vertical;word-break:break-word;}
+.prod-list .double-line{-webkit-line-clamp:2;}
+.prod-list .triple-line{-webkit-line-clamp:3;}
+.prod-list .soldOut,
+.prod-list .allsoldOut{font-size:14px;color:#fff;}
+.prod-list .minor{display:block;width:100%;height:100%;padding-top:70%;text-align:center;font-size:14px;font-size:calc(3vw + 2px);background:#f9f9f9 url('/mc-static-root/image/mypage/icon_minor.png') no-repeat 50%;background-size:cover;}
+.prod-list .minor em{font-style:normal;font-weight:bold;}
+.prod-list .appeal,
+.prod-list .sp{display:none;}
+/* 1단 세로형 */
+.prod-list.v1 .prod+.prod{margin-top:20px;}
+.prod-list.v1 .thumb{text-align:center;}
+.prod-list.v1 .pic-thumb{width:160px;height:160px;}
+.prod-list.v1 .flag-badge{left:20px;top:15px;}
+.prod-list.v1 .prod-info{padding:8px 20px 0;}
+.prod-list.v1 .brand::after{content:"";display:block;float:right;width:51px;height:14px;}
+.prod-list.v1 .prod-func{right:20px;top:8px;}
+.prod-list.v1 .minor{height:160px;padding:115px 0 25px;background-size:160px;}
+/* 2단 세로형 */
+.prod-list.v2{display:-webkit-box;display:-webkit-flex;display:flex;flex-wrap:wrap;justify-content:space-between;}
+.prod-list.v2 .prod{flex:1 1 50%;padding:15px 7.5px 15px 20px;max-width:50%;border-bottom:1px solid #e7e7e7;}
+.prod-list.v2 .prod:nth-child(even){padding:15px 20px 15px 7.5px;}
+.prod-list.v2 .prod:last-child,
+.prod-list.v2 .prod:nth-last-child(2):nth-child(odd){border-bottom:0;}
+.prod-list.v2 .thumb{height:calc(50vw - 27.5px);}
+.prod-list.v2 .prod-info{position:relative;padding:8px 5px 0;}
+.prod-list.v2 .prod-func{top:8px;right:0;}
+.prod-list.v2 .brand-name{display:none;}
+.prod-list.v2 .prod-name{margin-top:6px;}
+.prod-list.v2c .flag-badge,
+.prod-list.v2c .exclusive,
+.prod-list.v2c .brand-name,
+.prod-list.v2c .flags{display:none;}
+/* 1단 가로형 */
+.prod-list.h1 .prod{display:-webkit-box;display:-webkit-flex;display:flex;justify-content:space-between;align-items:flex-start;margin:0 20px;}
+.prod-list.h1 .prod+.prod{margin-top:20px;}
+.prod-list.h1 .thumb{flex:0 0 135px;width:135px;height:135px;margin-right:10px;}
+.prod-list.h1 .prod-info{flex:1 1 auto;}
+.prod-list.h1 .flags::after{content:"";display:block;float:right;width:51px;height:19px;}
+.prod-list.h1 .prod-func{right:0;bottom:0;}
+.prod-list.h1c .flag-badge,
+.prod-list.h1c .brand,
+.prod-list.h1c .flags{display:none;}
+.prod-list.h1c .thumb{flex:0 0 100px;width:100px;height:100px;}
+.prod-list.h1c .prod-name{margin-top:3px;}
+/* in swiper */
+.main-curation,
+.prod-container{padding:5px 15px 15px;background-color:#fff;}
+.main-curation .prod-list.swiper-wrapper,
+.prod-container .prod-list.swiper-wrapper{flex-wrap:nowrap;padding-bottom:11px;}
+.main-curation .prod-list.swiper-wrapper .prod,
+.prod-container .prod-list.swiper-wrapper .prod{flex:none;width:140px;padding:0;border:0;}
+.main-curation .prod-list.swiper-wrapper .thumb,
+.prod-container .prod-list.swiper-wrapper .thumb{width:140px;height:140px;}
+.main-curation .swiper-scrollbar,
+.prod-container .swiper-scrollbar{height:2px;background-color:#e5e5e5;border-radius:1px;}
+.main-curation .swiper-scrollbar .swiper-scrollbar-drag,
+.prod-container .swiper-scrollbar .swiper-scrollbar-drag{height:2px;border-radius:1px;background-color:#000;}
+/* main */
+[class^="main-"] .prod .rating,
+#main .prod .rating{display:none;}
+/* for iOS */
+@supports (-webkit-hyphens:none) {
+	.prod-list .flag{padding:1px 4px 3px;}
+}
+/* iPhone 5s,SE (1st Gen) */
+@media screen and (max-width:320px){
+	.prod-list.h1 .prod{margin:0 10px;}
+}
+
+/* 2020-10-16 메인개편 올알랭가이드 전체보기 팝업 */
+/* 공통 */
+.oyFullLayer .oyLayerContainer .oyHead .btnPrev{position:absolute;left:10px;top:10px;width:30px;height:30px;text-indent:-999px;background:url(/mc-static-root/image/svg/lt_9x19.svg) no-repeat 50% 50%;}
+/* 올알랭가이드 레이어 */
+.allalain{position:relative;}
+.allalain .btn-show-layer{position:absolute;right:5px;top:8px;padding:10px;font-weight:500;font-size:14px;color:#666;background-color:#fff;}
+.allalain .btn-show-layer::after{content:"";display:inline-block;width:8px;height:4px;margin-left:5px;vertical-align:4px;background:url(/mc-static-root/image/comm/score_select_close.png) no-repeat;background-size:8px 4px;transform:rotate(270deg);}
+.layer-allalain{display:none;height:100%;}
+.layer-allalain a:focus,
+.layer-allalain button:focus,
+.layer-allalain input:focus{border:0;outline:1px solid #9bce26;outline-offset:-1px;}
+.layer-allalain a,
+.layer-allalain button,
+.layer-allalain div,
+.layer-allalain p,
+.layer-allalain span,
+.layer-allalain strong{letter-spacing:0;word-spacing:0;}
+.layer-allalain.oyFullLayer .oyLayerContainer .oyTabContents{overscroll-behavior:contain;height:calc(100% - 98px);padding:0;}
+.layer-allalain.oyFullLayer .oyLayerContainer .oyTabContents .oyCont{padding:15px 20px;}
+.layer-allalain .oyTabs{display:flex;padding-top:50px;}
+.layer-allalain .oyTabs .oyTab{flex:1 1 50%;height:48px;padding:15px 0;text-align:center;font-size:14px;line-height:1.143;color:#666;border-bottom:2px solid #e5e5e5;}
+.layer-allalain .oyTabs .oyTab.active{font-weight:700;color:#9bce26;border-bottom-color:#9bce26;}
+.layer-allalain .oyTabs .oyTab span{vertical-align:2px;font-weight:400;font-size:10px;}
+.layer-allalain .oyTabContents:not(.active),
+.layer-allalain:not(.expand) .oyHead .btnPrev,
+.layer-allalain:not(.expand) .oyInnerContents,
+.layer-allalain.expand .oyTabs,
+.layer-allalain.expand .oyTabContents{display:none;}
+.layer-allalain .filter{display:flex;justify-content:space-between;margin-bottom:20px;}
+.layer-allalain .filter select{flex:0 0 calc(50% - 3px);width:auto;}
+.layer-allalain .video-list{margin:20px 0 13x}
+.layer-allalain .video-list li+li{margin-top:15px;}
+.layer-allalain .video-list a{display:flex;align-items:center;}
+.layer-allalain .video-list .v-thumb{flex:0 0 130px;}
+.layer-allalain .video-list .v-thumb img{width:130px;height:73px;object-fit:cover;}
+.layer-allalain .v-desc{flex:1 1;margin-left:10px;}
+.layer-allalain .v-title{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-weight:500;font-size:13px;line-height:1.385;letter-spacing:-0.015em;}
+.layer-allalain .v-info{margin-top:5px;font-size:12px;line-height:1.334;color:#888;}
+.layer-allalain .v-date+.v-view::before{content:"•";margin:0 3px 0 1px;}
+.layer-allalain .btn-load-more{display:block;margin:13px auto 0;padding:5px 20px;font-weight:500;font-size:14px;color:#666;background-color:#fff;}
+.layer-allalain .btn-load-more::after{content:"";display:inline-block;width:8px;height:4px;margin-left:5px;vertical-align:4px;background:url(/mc-static-root/image/comm/score_select_close.png) no-repeat;background-size:8px 4px;}
+.layer-allalain .oyInnerContents #yt-player2{width:100vw;height:56.25vw;}
+.layer-allalain .oyInnerContents .v-desc{flex:none;margin-left:0;padding:18px 20px 14px;}
+.layer-allalain .oyInnerContents .v-title{font-size:18px;line-height:1.223;color:#000;}
+.layer-allalain .oyInnerContents .v-info{font-size:13px;}
+@media screen and (max-width: 359px) {
+	.layer-allalain.oyFullLayer .oyLayerContainer .oyContents .oyCont{padding:15px;}
+	.layer-allalain .video-list .v-thumb{flex-basis:110px;}
+	.layer-allalain .video-list .v-thumb img{width:110px;height:62px;}
+	.layer-allalain .video-list .v-date+.v-view::before{content:"•";margin:0 3px 0 0;}
+}
+/* 지울요소 */
+.jdm-pop-exhbn .goods .price span{font-size:inherit;line-height:inherit;letter-spacing:0;color:inherit;}
+.jdm-pop-exhbn .goods .price span.strike{margin-right:0;}
+
+/* 2020-10-19 메인개편 인기 행사만 모았어요! (인기 기획전 상품카드 변경) contents.css@7479 ~ 7488째 줄 */
+.jdm-pop-exhbn .exhbn-copy{display:flex;flex-direction:column;justify-content:center;height:163px;padding:20px;}
+.jdm-pop-exhbn .exhbn-tit{font-size:18px;line-height:1.334;letter-spacing:-0.5px;color:#333;}
+.jdm-pop-exhbn .exhbn-stit{margin-top:4px;font-size:12px;line-height:1.17;letter-spacing:-0.5px;color:#555;}
+.jdm-pop-exhbn .goods li{position:relative;overflow:hidden;height:88px;margin:7px 15px;padding:10px 20px 10px 98px;border-radius:5px;background-color:#fff;}
+.jdm-pop-exhbn .goods a{display:flex;flex-direction:column;justify-content:center;height:100%;}
+.jdm-pop-exhbn .goods .thumb{flex:none;position:absolute;left:0;top:0;width:88px;height:88px;object-fit:contain;}
+.jdm-pop-exhbn .goods .name{overflow:hidden;max-height:2.308em;font-size:13px;line-height:1.154;letter-spacing:0;word-spacing:0;color:#333;display:-webkit-box;text-overflow:ellipsis;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.jdm-pop-exhbn .goods .price{margin:0;padding-right:42px;font-weight:400;}
+.jdm-pop-exhbn .goods .price span{display:inline-block;vertical-align:0;letter-spacing:0;word-spacing:0;}
+.jdm-pop-exhbn .goods .price span.rate{font-weight:700;font-size:12px;line-height:1.17;color:#e02020;}
+.jdm-pop-exhbn .goods .price span.strike{margin-left:3px;text-decoration:line-through;font-size:12px;line-height:1.17;color:#999;}
+.jdm-pop-exhbn .goods .price span.strike .won{font-size:11px;}
+.jdm-pop-exhbn .goods .price span.total{display:block;font-weight:500;font-size:16px;line-height:1.125;color:#000;}
+.jdm-pop-exhbn .goods .prod-func{right:2px;bottom:5px;padding:5px;}
+
+/* 2020-10-20 메인개편 쇼핑알림서비스 */
+#mHeader.lci.ixHead.noti-siblings,
+#fixBtn.noti-siblings,
+.footerTab.noti-siblings,
+.noti-assistant{transition:200ms transform ease-in 300ms;will-change:transform;}
+#mHeader.lci.ixHead.noti-siblings.on,
+#fixBtn.noti-siblings.on,
+.footerTab.noti-siblings.on,
+.footerTab.noti-siblings.on~.noti-assistant{transition-timing-function:ease-out;}
+#fixBtn.noti-siblings{z-index:21;}
+#fixBtn.noti-siblings.on{transform:translateY(-82px);}
+.footerTab.noti-siblings{border-top-color:#fff;}
+.footerTab.noti-siblings:not(.on){transform:translateY(92px);}
+.noti-assistant{position:fixed;left:0;bottom:0;z-index:19;overflow:hidden;width:100%;height:92px;padding:2px 0 52px;border-top-left-radius:15px;border-top-right-radius:15px;background-color:#fff;box-shadow:0px -20px 20px #0000002e;transform:translateY(92px);}
+.noti-assistant a,
+.noti-assistant span{letter-spacing:0;word-spacing:0;}
+.noti-assistant>.inner{height:100%;}
+.noti-assistant a{display:block;overflow:hidden;padding:11px 10px;text-overflow:ellipsis;white-space:nowrap;text-align:center;font-weight:700;font-size:15px;line-height:20px;color:#000;}
+.noti-assistant .point{color:#e02020;}
+.noti-assistant .countdown{font-size:16px;}
+.noti-assistant .flag{display:inline-block;height:20px;margin-right:5px;padding:3px 10px 2px;text-align:center;vertical-align:0;font-weight:500;font-size:10px;line-height:1.5;color:#fff;border-radius:10px;background-color:#e02020;}
+.footerTab.noti-siblings.on~.noti-assistant{transform:translateY(0);}
+/* for iOS */
+@supports (-webkit-hyphens:none) {
+	.noti-assistant .flag{padding:2px 10px 3px;}
+}

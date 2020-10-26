@@ -1,0 +1,3445 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<meta http-equiv="Content-Script-Type" content="text/javascript">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<meta name="format-detection" content="telephone=no">
+	<meta property="og:title" content="올리브영 모바일 메인"><!-- 사이트 명 -->
+	<meta property="og:url" content="http://"><!-- 사이트 URL -->
+	<meta property="og:image" content=""><!-- 대표 이미지 URL -->
+	<meta property="og:description" content=""><!-- 사이트 설명 -->
+	<title>💻전담개발 메인개편💻</title>
+	<link rel="stylesheet" href="/mc-static-root/css/global.css"/>
+	<link rel="stylesheet" href="/mc-static-root/css/common.css"/>
+	<link rel="stylesheet" href="/mc-static-root/css/board.css"/>
+	<link rel="stylesheet" href="/mc-static-root/css/contents.css"/>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/ixBand.min.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/ixSnack.min.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/swiper.min.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/publish/content_ui.js"></script>
+	<script type="text/javascript" src="/mc-static-root/js/common/jquery.lazyload.js"></script>
+	<script type="text/javascript">
+	//<![CDATA[
+		$(function(){
+			//2020-06-29 메인개편 추가 스크립트
+
+			//MC Main GNB Swiper
+			var gnbLi = $("#mGnb .gnb_cate li");
+			var mainSwiper = new Swiper('#mainSwiper', {
+				initialSlide: 0,
+				loop: true,
+				autoHeight: true,
+				observer: true,
+				observerParents: true,
+				touchAngle: 30,		//default 45deg
+				onInit(swiper) {
+					//GNB 탭 활성화
+					gnbLi.eq(0).addClass("on");
+				},
+				onSlideChangeStart(swiper) {
+					//슬라이드 시작 시
+				},
+				onSlideChangeEnd(swiper) {
+					//페이지 스크롤 0으로.
+					$(window).scrollTop(0);
+					//GNB 탭 활성 전환
+					gnbLi.filter(".on").removeClass("on");
+					var idx = swiper.realIndex;
+					gnbLi.eq(idx).addClass("on");
+				}
+			});
+
+			//GNB 클릭 시 스와이프 전환
+			gnbLi.children("a").on("click touch", function(e){
+				e.preventDefault();
+				if ( !$(this).hasClass("on") ) {
+					var idx = $(this).parent(gnbLi).index() + 1;
+					mainSwiper.slideTo(idx);
+				};
+			})
+
+			//Quick-Menu Swiper
+			var qmSwiper = {
+				initialSlide: 0,
+				slidesPerView: "auto",
+				observer: true,
+				observerParents: true,
+				freeMode: true,
+				touchAngle: 30,		//default 45deg
+				spaceBetween: 14,	// when window width is > 410px 
+				breakpoints: {
+					// when window width is <= 410px (320px ~ 410px -> 8px, 411px ~ 14px)
+					410: {
+						spaceBetween: 8
+					}
+				},
+				onInit(swiper) {
+					//이벤트 삭제
+				},
+				onSetTranslate(swiper, translate) {
+					//2020-07-09 보류
+					// const Qreachend = swiper.width - $(swiper.slides[0]).outerWidth(true) * (swiper.slides.length - 1) - $(".quick-menu .show-drawer").width(),
+					// 	Qgap = 80,
+					// 	Qgoal = Qreachend - Qgap,
+					// 	Qmore = $(".quick-menu .show-drawer button>span"),
+					// 	Qdiff = parseInt(Qreachend - translate);
+					// $(".mAllSearch").text(translate);
+					// console.log("Qreachend:" + Qreachend + ", Qgoal:" + Qgoal + ", Qdiff:" + Qdiff);
+					// if ( Qreachend < 0 && translate < Qreachend ) {
+					// 	Qmore.css({"transform":"translateX(" + (Qdiff / 10) + "px)"})
+					// 	if ( swiper.width < $(window).width() && translate < Qgoal ) showDrawer();
+					// } else {
+					// 	Qmore.attr("style", "");
+					// };
+				}
+			};
+			//quick-menu 항목이 5개보다 많을 때
+			var quickmenuOrigin = $(".quick-menu:eq(0)"),
+				quickmenu = $(".quick-menu");
+			if ( quickmenuOrigin.find(".swiper-slide").length > 5 ) {
+				quickmenu.removeClass("flex-quick-menu");
+				quickmenu.find(".show-drawer").show();
+				quickmenuswiper = Swiper('.quick-menu', qmSwiper);
+			};
+			//당겨서 드로어 메뉴 보여주기
+			function showDrawer(){
+				var drawer = $("#allMenu");
+				if ( !drawer.hasClass("ready") ) {
+					drawer.addClass("ready").stop().animate({opacity: 1}, 10, function(){
+						$("body").css("overflow", "hidden");
+						$(this).addClass("visible").find(".btn-drawer-closer").removeClass("allmenuClose").on("click touch", function(e){
+							e.preventDefault();
+							$(this).addClass("allmenuClose");
+							drawer.removeClass("visible").stop().animate({opacity: 1}, 300, function(){
+								$("body").css("overflow", "visible");
+								drawer.removeClass("ready");
+							});
+						});
+					});
+				};
+			};
+			//더 보기 버튼 눌렀을 때
+			$(".show-drawer button").on("click touch", function(){
+				$("#footerTabCategoy").trigger("click");
+			});
+
+			//상단 sub gnb 들
+			$(".mSubGnb").each(function(index, element){
+				var $this = $(this);
+				$this.addClass('sub-gnb' + index);
+				var swiper = new Swiper('.sub-gnb' + index, {
+					initialSlide: 0,
+					slidesPerView: 'auto',
+					paginationClickable: true,
+					spaceBetween: 0,
+					loop: false
+				});
+			});
+
+			//탭 show/hide
+			var jdTab = function(elem) {
+				var tc = elem.siblings(".tab_contents"),
+					tl = elem.find("li"),
+					ta = tl.find("a"),
+					mainS = $("#mainSwiper>.swiper-wrapper"),
+					init = 0;
+				function tabAction(i){
+					tc.not(":eq("+i+")").hide();
+					tc.eq(i).show();
+					tl.eq(i).addClass("on").siblings(".on").removeClass("on");
+				};
+				tabAction(init);
+				ta.on("click touch", function(){
+					if ( ! $(this).parent(tl).hasClass("on") ) {
+						var pi = $(this).parent().index();
+						tabAction(pi);
+						mainSwiper.update();
+					};
+				});
+			};
+			$(".mFixTab").each(function(){
+				jdTab($(this));
+			});
+
+			//베스트 > 리뷰베스트 swipe
+			var review_best = {
+				autoplay: false,
+				freeMode: false,
+				slidesPerView: 'auto',
+				spaceBetween: 0,
+				observer: true,
+				observerParents: true,
+				onInit(swiper){
+					//target이 :hidden일 때, 해당 탭 터치 시 swiper.update() 실행 (:hidden 상태에선 width값이 없어서 영역을 비정상적으로 설정함)
+					if ( $(".review_best_slide").is(":hidden") ) {
+						$(".btn-review-best").on("click touch", function(){
+							review_swiper.update();
+						});
+					}
+				}
+			}, review_swiper = Swiper('.review_best_slide', review_best );
+		});
+	</script>
+	<script type="text/javascript">
+	//<![CDATA[
+		$(function(){
+
+			var mGnb_init_no = $('#mGnb').find('li.on').index();
+			if(mGnb_init_no < 0) mGnb_init_no = 0;
+
+			//메인 슬라이드 S
+			var mVisual = $('.mVisual-slide'),
+				ixItems = mVisual.find('.ix-list-items'),
+				ixItem = mVisual.find('.ix-list-item'),
+				ixItemLen = ixItem.length-1;
+
+			ixItem.eq(0).addClass('st');
+			mVisual.ixOverlayList();
+			mVisual.find('li[data-idx='+ixItemLen+']').addClass('prev');
+			mVisual.on('ixOverlayList:slideStart', function(e){
+				var index = e.currentIndex,
+					direction = e.direction;
+				if(direction == 'next'){
+					var index = index<ixItemLen ? index = index + 1 : index = 0;
+				}else{
+					var index = index<=0 ? index = ixItemLen : index = index - 1;
+				}
+				ixItems.find('li[data-idx='+index+']').addClass('on');
+			});
+			mVisual.on('ixOverlayList:slideEnd', function(e){
+				var index = e.currentIndex,
+					direction = e.direction;
+				if(direction == 'next'){
+					var index = index<=0 ? index = ixItemLen : index = index - 1;
+				}else{
+					var index = index>=ixItemLen ? index = 0 : index = index + 1;
+				}
+				ixItems.find('li[data-idx='+index+']').removeClass('on');
+
+				var addprev = e.currentIndex;
+				var addprev = addprev<=0 ? addprev = ixItemLen : addprev = addprev - 1;
+				ixItems.find('li[data-idx='+addprev+']').addClass('prev');
+
+				var remprev = e.currentIndex;
+				var remprev = remprev>=ixItemLen ? remprev = 0 : remprev = remprev + 1;
+				ixItems.find('li[data-idx='+remprev+']').removeClass('prev');
+				//초기 st 삭제
+				ixItem.removeClass('st');
+			})
+			mVisual.find('.btnPlay').on('click', function(){
+				if(!$(this).hasClass('pause')){
+  		   			$(this).addClass('pause');
+  		   			mVisual.ixOverlayList('startTimer');
+  			   	}else{
+		   			$(this).removeClass('pause');
+		   			mVisual.ixOverlayList('stopTimer');
+  				}
+			});
+			$(window).on( 'resize', function(e) {
+				mVisual.ixOverlayList('resize');
+			});
+			//메인 슬라이드 E
+
+			//메인일경우 footer padding 변경
+			if(mVisual.length > 0){
+				$('#mFooter').css('padding-top', 0);
+			}
+
+	  		/* 상단 띠배너 S */
+	  		var mBand = $('#mBand'),
+	  			mBitem = mBand.find('.swiper-slide'),
+	  			mBitemLen = mBitem.length;
+
+	  		if(mBitemLen>1){
+				var mBand = new Swiper('#mBand', {
+					initialSlide:0,
+					slidesPerView:'auto',
+					nextButton: '.next',
+					prevButton: '.prev',
+				});
+	  		}else{
+	  		  mBand.addClass('one');
+	  		}
+	  		/* 상단 띠배너 E */
+
+
+			/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+			//검색 레이어 닫힌 후 동작 예시 2017-01-18
+			$('.mAllSearch a').click(function(){
+				$('#mWrapper').hide();
+				$('#mSearchWrapper').show();
+				banner_swiper.destroy(); //필수
+			})
+			$('#mSearchWrapper button').click(function(){
+				$('#mWrapper').show();
+				visual_swiper = Swiper('#mHome-visual', visual_set ); //필수
+				$('#mSearchWrapper').hide()
+			})
+			/* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+
+			//카테고리 BEST 플리킹
+			var mSubGnb_swiper = new Swiper('#mSub1s-menu', {
+				initialSlide: 0,
+				slidesPerView: 'auto',
+				paginationClickable: true,
+				spaceBetween: 0,
+				loop: false
+			});
+
+			//인기 브랜드 플리킹
+			var mSubGnb_swiper = new Swiper('#mSub2s-menu', {
+				initialSlide: 0,
+				slidesPerView: 'auto',
+				paginationClickable: true,
+				spaceBetween: 0,
+				loop: false
+			});
+
+			//카드할인 배너 2018-10-01
+			var mCardBanner = new Swiper('#cardSlide', {
+				initialSlide: 0,
+				slidesPerView: 1,
+				paginationClickable: true,
+				autoplay: false,
+				pagination: '.paging',
+				loop: false
+			});
+
+			//브랜드 배너 플리킹 2017-01-18 수정
+			var banner_set = {
+				slidesPerView: 1,
+				paginationClickable: true,
+				spaceBetween: 30,
+				nextButton: '.next',
+				prevButton: '.prev',
+				freeMode: false,
+				loop: true
+			}, banner_swiper = Swiper('#mHome-onlyone', banner_set );
+
+			//앱다운로드 배너 추가건
+			$(".hd_banner_close").click(function(){
+				$('#webBanner').css('display','none');
+				//$('#mHome-visual').css({'padding-top':'0'}); 기존 슬라이드 간격에서 부모 간격으로 변경
+				$('#mContents').css({'padding-top':'0'});
+			});
+			if($('#webBanner').css("display") == 'block'){
+				$('#mContents').css({'padding-top':'48px'});
+			}else{
+				if($('#webBanner').css("display") == 'none'){
+					$('#mContents').css({'padding-top':'0'});
+				}
+			}
+		});
+
+
+
+		//메인 비쥬얼 인디게이터
+		function pagingLoad(){
+			var _bulStop = $('.mHome-visual .control_box'),
+				_bulDot = $('.mHome-visual .control_box .paging span'),
+				_bulDotWt = (100/(_bulDot.length))+'%';
+
+			_bulDot.css('width', _bulDotWt)
+		}
+
+		//layer 팝업
+		function popLayerOpen (IdName){	
+			var winH = $(window).height()-100; //수정함
+			var popLayer = ('#'+IdName);		  
+			/* var winH = $(window).height()/2;
+			var popLayer = $(".popLayerWrap"); */
+			 $(popLayer).find('.popCont').css({'max-height': winH});
+
+			var popPos = $(popLayer).height()/2;
+			var popWid = $(popLayer).width()/2;
+			//$(popLayer).css({'left':'50%' , 'margin-left':-(popWid) , 'top':'50%' , 'margin-top':-(popPos)}).show().parents('body').css({'overflow' : 'hidden'});
+			$(popLayer).css({'left':'50%' , 'margin-left':-(popWid) , 'top':'50%' , 'margin-top':-(popPos)}).show().parents('body').css({'overflow' : 'hidden'});
+			$('.dim').show();
+
+			$('.dim').bind('click', function(){
+				popLayerClose(IdName);
+			});
+
+			$(window).resize(function(){
+				winH = $(window).height()/2;
+			   $(popLayer).find('.popCont').css({'max-height': winH});
+				popPos =$(popLayer).height()/2;
+				popWid = $(popLayer).width()/2;
+				$(popLayer).css({'left':'50%' , 'margin-left':-(popWid) , 'top':'50%' , 'margin-top':-(popPos)})
+			});
+
+		};
+
+		function popLayerClose (){
+			var popLayer = $(".popLayerWrap");
+			var mHeader = $('#mHeader');
+			//$(popLayer).hide().parents('body').css({'overflow-y' : 'auto'});
+			$(popLayer).hide().parents('body').removeAttr('style');
+			$('.dim').hide();
+		};
+	//]]>
+	</script>
+
+</head>
+<body id="main">
+<!-- #mWrapper -->
+<div id="mWrapper">
+	<!-- #mHeader -->
+	<div id="mHeader" class="ixHead mHome lci"><!-- ixHead : 메인 헤더 / subHead : 서브 헤더 클래스 구분 -->
+		<!-- 앱다운로드 배너 추가건 -->
+		<!-- <div class="header_banner" id="webBanner" style="display:block">
+			<div class="hd_banner_cont">앱 설치하면 <span class="point">5% 할인쿠폰</span> 드려요</div>
+			<a class="hd_banner_close">닫기</a>
+		</div> -->
+
+		<!-- 메인 헤더 영역 -->
+		<div id="mHgroup">
+			<h1><a href="#" class="logo">OLIVE YOUNG</a></h1>
+			<span class="mAllSearch app">
+				<a href="#none">본격 썬케어 시즌! 본격 썬케어 시즌2 ! 본격 썬케어 시즌2 ! 본격 썬케어 시즌2 ! 본격 썬케어 시즌2 ! 본격 썬케어 시즌2 !</a>
+				<button type="button" class="m_btn_sch">검색</button>
+				<button type="button" class="m_btn_barcode">바코드검색</button>
+			</span>
+			<span class="mBasket"><button type="button" class="basket">장바구니<span class="cnt">80</span></button></span>
+		</div>
+
+		<!-- 메인 GNB 영역 -->
+		<div id="mGnb">
+			<ul class="gnb_cate">
+				<li class="swiper-slide"><a href="submain_home.html"><span>홈</span></a></li>
+				<li class="swiper-slide"><a href="submain_hotdeal.html"><span>오특</span></a></li>
+				<li class="swiper-slide"><a href="submain_new.html"><span>신상</span></a></li>
+				<li class="swiper-slide"><a href="submain_best.html"><span>베스트</span></a></li>
+				<li class="swiper-slide"><a href="submain_plan.html"><span>기획전</span></a></li>
+				<li class="swiper-slide"><a href="submain_event.html"><span>이벤트</span></a></li>
+			</ul>
+		</div>
+		<!-- //메인 GNB 영역 -->
+
+	</div>
+	<!-- //#mHeader -->
+	<!-- #mContainer -->
+	<div id="mContainer" class="mMain lci">
+		<!-- #mContents -->
+		<div id="mContents">
+
+			<div id="mainSwiper" class="swiper-container">
+				<div class="swiper-wrapper">
+					<!-- ↓ 홈 -->
+					<div class="swiper-slide">
+						<!-- 메인배너 변경 200521 S-->
+						<div class="mVisualArea">
+							<!-- <div class="mVheight"><img src="http://m.lomo.com/mc-static-root/image/temp/m_visual_loading.gif" /></div> -->
+							<div class="mVisual-slide" data-ix-options="motion-type:slide;auto-play:true;delay:5000;duration:200;viewport-ratio:75 70;">
+								<div class="ix-list-viewport">
+									<ul class="ix-list-items">
+										<li class="ix-list-item">
+											<a href="#n">
+												<div class="thum"><img class="" src="http://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/180039369180675682.jpg"></div>
+												<!-- <div class="thum"><img class="msLazy" data-original="http://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/180039369180675682.jpg"></div> -->
+												<div class="dec">
+													<p class="txt">1나를 빛내줘~ 올리브영!<br>트윙클 할로윈</p>
+													<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+												</div>
+											</a>
+										</li>
+										<li class="ix-list-item">
+											<a href="#n">
+												<div class="thum"><img class="" src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/6767022671105612523.jpg"></div>
+												<div class="dec">
+													<p class="txt">2나를 빛내줘~ 올리브영!<br>트윙클 할로윈</p>
+													<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+												</div>
+											</a>
+										</li>
+										<li class="ix-list-item">
+											<a href="#n">
+												<div class="thum"><img class="" src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/5981228611284235290.jpg"></div>
+												<div class="dec">
+													<p class="txt">3나를 빛내줘~ 올리브영!<br>트윙클 할로윈</p>
+													<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+												</div>
+											</a>
+										</li>
+										<li class="ix-list-item">
+											<a href="#n">
+												<div class="thum"><img class="" src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/1/2837028763006609114.jpg"></div>
+												<div class="dec">
+													<p class="txt">4나를 빛내줘~ 올리브영!<br>트윙클 할로윈</p>
+													<p class="txt_sub">내 손안의 달빛 트윙클 할로윈키트 증정</p>
+												</div>
+											</a>
+										</li>
+									</ul>
+								</div>
+								<div class="ix-controller">
+									<ul class="ix-thumbs">
+										<li class="ix-thumb"></li>
+									</ul>
+									<button type="button" class="btnPlay pause">자동재생/멈춤</button>
+								</div>
+							</div>
+						</div>
+						<!-- //mVisual-slide -->
+
+						<!-- ↓ 2020-07-01 퀵메뉴 변경 -->
+						<div class="quick-menu swiper-container flex-quick-menu">
+							<ul class="swiper-wrapper">
+								<!-- ↓ 2020-07-03 아이콘 노출 방식 bg -> <img> 로 변경 -->
+								<li class="swiper-slide new"><a href="javascript:common.link.moveSpcShop('500000200080001');"><img src="/mc-static-root/image/comm/icon-qck-luxuryshop.png" alt="프리미엄관">프리미엄관</a></li>
+								<li class="swiper-slide"><a href="javascript:common.link.moveGift();"><img src="/mc-static-root/image/comm/icon-qck-gift.png" alt="기프트관">기프트관</a></li>
+								<li class="swiper-slide"><a href="javascript:common.link.moveSale();"><img src="/mc-static-root/image/comm/icon-qck-sale.png" alt="세일">세일</a></li>
+								<li class="swiper-slide new"><a href="javascript:common.link.moveMembership();"><img src="/mc-static-root/image/comm/icon-qck-coupon.png" alt="멤버십/쿠폰">멤버십/쿠폰</a></li>
+								<li class="swiper-slide"><a href="javascript:common.link.moveOllyoung();"><img src="/mc-static-root/image/comm/icon-qck-ollyoung.png" alt="올영체험단">올영체험단</a></li>
+								<li class="swiper-slide"><a href="#"><img src="/mc-static-root/image/comm/icon-qck-todelivery.png" alt="오늘드림">오늘드림</a></li>
+								<li class="swiper-slide"><a href="javascript:common.link.moveGiftcard();"><img src="/mc-static-root/image/comm/icon-qck-giftcard.png" alt="기프트카드">기프트카드</a></li>
+								<!-- <li class="swiper-slide show-drawer"><button type="button"><span>카테고리</span></button></li> -->
+							</ul>
+						</div>
+						<!-- ↑ 퀵메뉴 변경 -->
+
+						<div class="mMenu" style="display:none;">
+							<ul class="inner">
+								<li class="menu_01 new"><a href="javascript:common.link.moveSpcShop('500000200080001');" data-ref-menuid="home_quick_luxuryshop">프리미엄관</a></li>
+								<li class="menu_10 new"><a href="javascript:common.link.moveGift();" data-ref-menuid="home_quick_gift">기프트관</a></li>
+								<li class="menu_03"><a href="javascript:common.link.moveSale();" data-ref-menuid="home_quick_sale">세일</a></li>
+								<li class="menu_04"><a href="javascript:common.link.moveMembership();" data-ref-menuid="home_quick_coupon">멤버십/쿠폰</a></li>
+								<li class="menu_05"><a href="javascript:common.link.moveOllyoung();" data-ref-menuid="home_quick_ollyoung">올영체험단</a></li>
+							</ul>
+						</div>
+
+						<!-- 온라인몰 메인페이지 UX 개선 - 상단 띠배너 S -->
+						<div class="mBand-banner">
+							<div class="swiper-container" id="mBand">
+								<div class="swiper-wrapper">
+									<div class="swiper-slide"><div class="swiper-button prev"></div><a href="#none"><img src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/138/8028039183027994296.jpg" alt=""></a></div>
+									<div class="swiper-slide"><div class="swiper-button next"></div><a href="#none"><img src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/138/4147876801788442285.jpg" alt=""></a></div>
+								</div>
+							</div>
+						</div>
+						<!-- 온라인몰 메인페이지 UX 개선 - 상단 띠배너 E -->
+						<div class="curation_wrap line">
+							<p class="txt_user tc"><span>최유리</span>님이 <em>좋아할 만한 상품을 추천</em>해 드려도 될까요?</p>
+							<p class="btnSmallArea btnType01">
+								<button type="button" class="btnGreen" onclick="javascript:popLayerOpen('curation_agreed');">좋아요!</button>
+							</p>
+						</div>
+						<div class="curation_wrap">
+
+							<!-- #메인페이지UI개선 장바구니 기능 추가 S -->
+							<div class="tit_cuarea">
+								<h4 class="tit"><span>최유리</span>의 구매상품과 어울리는 상품</h4>
+								<button class="btnRefresh" type="button">새로추천</button>
+							</div>
+							<div class="swiper-container curation_area" id="curation1">
+								<ul class="swiper-wrapper curation_list">
+								<li class="swiper-slide">
+									<a href="#none" class="item">
+										<span class="imgSmall">
+											<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+										</span>
+										<span class="text">정사이즈 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+										<div class="parea">
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+										</div>
+										<span class="icon">
+											<span class="plus">1+1</span>
+											<span class="coupon">쿠폰</span>
+											<span class="gift">증정</span>
+											<span class="delivery">오늘드림</span>
+										</span>
+									</a>
+									<button type="button" class="btnbag off">장바구니 담기</button><!-- //비활성화 off -->
+								</li>
+								<li class="swiper-slide">
+									<a href="#none" class="item">
+										<span class="imgSmall">
+											<span class="img"><img src="https://image.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0010/A00000010272703ko.jpg" alt=""></span>
+										</span>
+										<span class="text">이미지 가로 림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+										<div class="parea">
+											<span class="won">42,000<em>원</em></span>
+										</div>
+										<span class="icon">
+											<span class="plus">1+1</span>
+											<span class="coupon">쿠폰</span>
+											<span class="gift">증정</span>
+											<span class="delivery">오늘드림</span>
+										</span>
+									</a>
+									<button type="button" class="btnbag">장바구니 담기</button>
+								</li>
+								<li class="swiper-slide">
+									<a href="#none" class="item">
+										<span class="imgSmall">
+											<span class="img"><img src="https://image.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0001/A00000001027601ko.jpg" alt=""></span>
+										</span>
+										<span class="text">이미지 세로 리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+										<div class="parea">
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+										</div>
+										<span class="icon">
+											<span class="plus">1+1</span>
+											<span class="coupon">쿠폰</span>
+											<span class="gift">증정</span>
+										</span>
+									</a>
+									<button type="button" class="btnbag">장바구니 담기</button>
+								</li>
+								<li class="swiper-slide">
+									<a href="#none" class="item">
+										<span class="imgSmall">
+											<span class="img"><img src="https://image.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0001/A00000001027601ko.jpg" alt=""></span>
+										</span>
+										<span class="text">이미지 세로 리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+										<div class="parea">
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+										</div>
+										<span class="icon">
+											<span class="plus">1+1</span>
+											<span class="coupon">쿠폰</span>
+											<span class="gift">증정</span>
+										</span>
+									</a>
+									<button type="button" class="btnbag">장바구니 담기</button>
+								</li>
+								<li class="swiper-slide">
+									<a href="#none" class="item">
+										<span class="imgSmall">
+											<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+										</span>
+										<span class="text">정사이즈 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+										<div class="parea">
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+										</div>
+										<span class="icon">
+											<span class="plus">1+1</span>
+											<span class="coupon">쿠폰</span>
+											<span class="gift">증정</span>
+											<span class="delivery">오늘드림</span>
+										</span>
+									</a>
+									<button type="button" class="btnbag">장바구니 담기</button>
+								</li>
+								<li class="swiper-slide">
+									<a href="#none" class="item">
+										<span class="imgSmall">
+											<span class="img"><img src="https://image.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0010/A00000010272703ko.jpg" alt=""></span>
+										</span>
+										<span class="text">이미지 가로 림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+										<div class="parea">
+											<span class="won">42,000<em>원</em></span>
+										</div>
+										<span class="icon">
+											<span class="plus">1+1</span>
+											<span class="coupon">쿠폰</span>
+											<span class="gift">증정</span>
+											<span class="delivery">오늘드림</span>
+										</span>
+									</a>
+									<button type="button" class="btnbag">장바구니 담기</button>
+								</li>
+								</ul>
+								<div class="swiper-scrollbar"></div>
+							</div>
+
+							<hr class="bline">
+
+							<!-- <p class="txt_user tc"><em>최근 본 상품의 연관상품</em></p> -->
+							<div class="tit_cuarea">
+								<h4 class="tit">요즘 올리브영에서 뜨는 상품</h4>
+								<button class="btnRefresh recomNext" type="button">새로추천</button>
+							</div>
+							<div class="swiper-container curation_area typeA2" id="curation2">
+								<ul class="swiper-wrapper curation_list">
+								<li class="swiper-slide">
+									<div class="inner">
+										<div class="vitem">
+											<span class="imgSmall"><span class="img"><img src="http://image.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0010/A00000010272703ko.jpg" alt=""></span></span>
+										</div>
+										<div class="opt">
+											<span class="text">정사이즈 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+											<div class="parea">
+												<span class="sale">36,000<em>원</em></span>
+												<span class="won">42,000<em>원</em></span>
+												<button type="button" class="btnbag off">장바구니 담기</button>
+											</div>
+											<span class="icon">
+												<span class="sale">세일</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="delivery">오늘드림</span>
+											</span>
+										</div>
+										<a href="#n" class="link">상품 바로가기</a>
+									</div>
+									<div class="inner">
+										<div class="vitem">
+											<span class="imgSmall"><span class="img"><img src="http://image.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0013/A00000013574302ko.jpg" alt=""></span></span>
+										</div>
+										<div class="opt">
+											<span class="text">브링그린 사철쑥약산성 클렌징 폼 200ml</span>
+											<div class="parea">
+												<span class="sale">36,000<em>원</em></span>
+												<span class="won">42,000<em>원</em></span>
+												<button type="button" class="btnbag">장바구니 담기</button>
+											</div>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+											</span>
+										</div>
+										<a href="#n" class="link">상품 바로가기</a>
+									</div>
+									<div class="inner">
+										<div class="vitem">
+											<span class="imgSmall"><span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span></span>
+										</div>
+										<div class="opt">
+											<span class="text">브링그린 사철쑥약산성 </span>
+											<div class="parea">
+												<span class="won">42,000<em>원</em></span>
+												<button type="button" class="btnbag">장바구니 담기</button>
+											</div>
+										</div>
+										<a href="#n" class="link">상품 바로가기</a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<div class="inner">
+										<div class="vitem">
+											<span class="imgSmall"><span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span></span>
+										</div>
+										<div class="opt">
+											<span class="text">정사이즈 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+											<div class="parea">
+												<span class="sale">36,000<em>원</em></span>
+												<span class="won">42,000<em>원</em></span>
+												<button type="button" class="btnbag">장바구니 담기</button>
+											</div>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="delivery">오늘드림</span>
+											</span>
+										</div>
+										<a href="#n" class="link">상품 바로가기</a>
+									</div>
+									<div class="inner">
+										<div href="#" class="vitem">
+											<span class="imgSmall"><span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span></span>
+										</div>
+										<div class="opt">
+											<span class="text">브링그린 사철쑥약산성 클렌징 폼 200ml</span>
+											<div class="parea">
+												<span class="sale">36,000<em>원</em></span>
+												<span class="won">42,000<em>원</em></span>
+												<button type="button" class="btnbag">장바구니 담기</button>
+											</div>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+											</span>
+										</div>
+										<a href="#n" class="link">상품 바로가기</a>
+									</div>
+									<div class="inner">
+										<div class="vitem">
+											<span class="imgSmall"><span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span></span>
+										</div>
+										<div class="opt">
+											<span class="text">브링그린 사철쑥약산성 </span>
+											<div class="parea">
+												<span class="won">42,000<em>원</em></span>
+												<button type="button" class="btnbag">장바구니 담기</button>
+											</div>
+										</div>
+										<a href="#n" class="link">상품 바로가기</a>
+									</div>
+								</li>
+								<li class="swiper-slide">
+									<div class="inner">
+										<div class="vitem">
+											<span class="imgSmall"><span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span></span>
+										</div>
+										<div class="opt">
+											<span class="text">정사이즈 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+											<div class="parea">
+												<span class="sale">36,000<em>원</em></span>
+												<span class="won">42,000<em>원</em></span>
+												<button type="button" class="btnbag">장바구니 담기</button>
+											</div>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="delivery">오늘드림</span>
+											</span>
+										</div>
+										<a href="#n" class="link">상품 바로가기</a>
+									</div>
+									<div class="inner">
+										<div class="vitem">
+											<span class="imgSmall"><span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span></span>
+										</div>
+										<div class="opt">
+											<span class="text">브링그린 사철쑥약산성 클렌징 폼 200ml</span>
+											<div class="parea">
+												<span class="sale">36,000<em>원</em></span>
+												<span class="won">42,000<em>원</em></span>
+												<button type="button" class="btnbag">장바구니 담기</button>
+											</div>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+											</span>
+										</div>
+										<a href="#n" class="link">상품 바로가기</a>
+									</div>
+									<div class="inner">
+										<div class="vitem">
+											<span class="imgSmall"><span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span></span>
+										</div>
+										<div class="opt">
+											<span class="text">브링그린 사철쑥약산성 </span>
+											<div class="parea">
+												<span class="won">42,000<em>원</em></span>
+												<button type="button" class="btnbag">장바구니 담기</button>
+											</div>
+										</div>
+										<a href="#n" class="link">상품 바로가기</a>
+									</div>
+								</li>
+								</ul>
+								<div class="swiper-scrollbar"></div>
+							</div>
+						</div>
+						<script>
+						$(function(){
+							var curation_swiper1 = new Swiper('#curation1', {
+							//slidesPerView: 2.5,
+							slidesPerView:'auto',
+							scrollbar: '.swiper-scrollbar',
+							scrollbarHide: false,
+							freeMode:true,
+							freeModeMomentumRatio: 0.5,
+							freeModeMomentumVelocityRatio: 0.5,
+							});
+							var curation_swiper2 = new Swiper('#curation2', {
+							slidesPerView:1,
+							scrollbar: '.swiper-scrollbar',
+							scrollbarHide: false,
+							/* freeMode:true,
+							freeModeMomentumRatio: 0.5,
+							freeModeMomentumVelocityRatio: 0.5, */
+							});
+
+							//recomNext 버튼을 클릭하면 옆으로 이동
+							$('.recomNext').on('click', function(){
+								var len = curation_swiper2.slides.length,
+									idx = (curation_swiper2.activeIndex)+1;
+								//console.log(len);
+								//console.log(idx);
+								if(len == idx){
+									curation_swiper2.slideTo(0);
+								}else{
+									curation_swiper2.slideNext();
+								}
+							});
+
+							//curation_swiper.update(); 새로고침
+							//curation_swiper.slideTo(2);
+						});
+						</script>
+						<!-- 큐레이션 서비스 E -->
+						<div class="band-Banner today">
+							<a href="#none"><img src="/mc-static-root/image/temp/main_banner_td_202002.jpg" alt="주문한 날 받아보는 오늘드림 배송 서비스"></a>
+						</div>
+						<!--쇼핑키워드 star -->
+						<div class="keyword-area">
+							<h2>쇼핑키워드</h2>
+							<ul>
+								<li>온라인몰 단독</li>
+								<li>닥터자르트</li>
+								<li>10월 한정특가</li>
+							</ul>
+						</div>
+						<!-- //쇼핑키워드 end -->
+
+						<hr class="bline">
+						
+						<!-- ↓ 추천기획전 2020-06-23 -->
+						<h2 class="home-stit-18">추천 기획전</h2>
+						<div class="jdm-recomm-exhbn">
+							<a href="#" class="exhbn-banner">
+								<img src="/mc-static-root/image/temp/@banner_750x340_01.jpg" alt="Make Prem 베이스 미 틴티드 글로우 쿠션">
+								<p class="exhbn-copy">
+									<span class="exhbn-tit">올리브영과 함께하는 다정한 클린뷰티 라이프!</span>
+									<span class="exhbn-stit">이벤트 참여하면, 경품&amp;기부까지!</span>
+								</p>
+							</a>
+							<a href="#" class="exhbn-banner">
+								<img src="/mc-static-root/image/temp/@banner_750x340_02.jpg" alt="미구하라 미백&amp;수분에 미치다">
+								<p class="exhbn-copy">
+									<span class="exhbn-tit">일이삼사오육칠팔구십일이삼사오육칠팔구십</span>
+									<span class="exhbn-stit">일이삼사오육칠팔구십일이삼사오육칠팔구십</span>
+								</p>
+							</a>
+						</div>
+						<!-- ↑ 추천기획전 -->
+
+						<!-- ↓ 인기기획전 2020-06-23 -->
+						<h2 class="home-stit-18">인기 행사만 모았어요!</h2>
+						<div class="jdm-pop-exhbn">
+							<div class="swiper-container" id="jdpe">
+								<div class="pagination">
+								</div>
+								<ul class="swiper-wrapper">
+									<li class="swiper-slide" style="background-image:url('../../image/temp/@banner650x730_01.png');" data-hashtag="몇자가들어가나">
+										<!--
+											2020-07-09 카피 영역 수정
+											span.exhbn-tit width:140px; 한글 기준 줄 당 8자 내외. 길면 자동으로 줄 내림. 두 줄 이상 넘어가지 않고 말줄임 처리.
+											span.exhbn-stit width:auto; 메인카피와 비슷한 너비로는 대략 한글 15자 내외.
+										-->
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">일이삼사오육칠팔구십일이삼사오육칠팔구십</span>
+											<span class="exhbn-stit">일이삼사오육칠팔구십일이삼사오육칠팔구십</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('../../image/temp/@banner828x730_01.jpg');" data-hashtag="우리집오늘드림">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">우리집에도 오늘드림이 올까요?</span>
+											<span class="exhbn-stit">확인만해도CJONE포인트증정</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('../../image/temp/@banner828x730_01.jpg');" data-hashtag="마몽드블루캐모마일크림">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">마몽드의#찐한진정 블루캐모마일크림런칭</span>
+											<span class="exhbn-stit">#금액대별 증정혜택</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('../../image/temp/@banner828x730_01.jpg');" data-hashtag="에뛰드">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">에뛰드 더블래스팅 쿠션커버with솔미</span>
+											<span class="exhbn-stit">#피지쏙  베이스키트증정</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('../../image/temp/@banner828x730_01.jpg');" data-hashtag="완벽한여름">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">완벽한 여름을 위해 최대15%+한정증정</span>
+											<span class="exhbn-stit">M.A.C 헤라 크리니크 등</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+									<li class="swiper-slide" style="background-image:url('../../image/temp/@banner828x730_01.jpg');" data-hashtag="덴탈케어페리오">
+										<p class="exhbn-copy">
+											<span class="exhbn-tit">COOL 덴탈케어 페리오로 시원하게!</span>
+											<span class="exhbn-stit">#최대1+1 #7%쿠폰</span>
+										</p>
+										<ul class="goods">
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_01.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+											<li>
+												<a href="#">
+													<img src="/mc-static-root/image/temp/@category220x220_02.png" alt="상품 이미지" class="thumb">
+													<p class="name">[온라인 단독] 웨메 디파이닝 커버 컨실러 기획 세트</p>
+													<p class="price">
+														<span class="strike">53,000원</span>
+														<span>832,000원</span>
+													</p>
+												</a>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<script>
+							//shuffle
+							$.fn.shuffle = function() {
+								var allElems = this.get(),
+									getRandom = function(max) {
+										return Math.floor(Math.random() * max);
+									},
+									shuffled = $.map(allElems, function(){
+										var random = getRandom(allElems.length),
+											randEl = $(allElems[random]).clone(true)[0];
+										allElems.splice(random, 1);
+										return randEl;
+									});
+								this.each(function(i){
+									$(this).replaceWith($(shuffled[i]));
+								});
+								return $(shuffled);
+							};
+							//셔플 먼저
+							$("#jdpe>.swiper-wrapper>.swiper-slide").shuffle();
+							// var hashtags = ["봄향기", "다이어트", "단종수비대", "민감성", "5분만에외출준비끝", "홈케어의정석"];
+							//swiper 생성
+							var jdpeSwiper = new Swiper('#jdpe', {
+								initialSlide: 0,
+								loop: true,		//2020-07-20 루프 추가됨.
+								speed: 300,
+								slidesPerView: '1.15',
+								spaceBetween: 5,
+								pagination: ".pagination",
+								paginationClickable: true,
+								paginationBulletRender(swiper, index, className){
+									//2020-07-13 불릿(탭) 텍스트 변경
+									return '<button type="button" class="' + className + '">' + "#" + $("#jdpe>.swiper-wrapper>.swiper-slide").eq(index + 1).attr("data-hashtag") + '</button>';
+								}
+							});
+						</script>
+						<!-- ↑ 인기기획전 -->
+
+						<!-- 카테고리 BEST star -->
+						<h2 class="home-stit">카테고리 랭킹</h2>
+						<div id="mSub1s-menu" class="swiper-container">
+							<ul class="sub_gnb_cate swiper-wrapper">
+								<li class="swiper-slide on"><a href="#">SKIN</a></li>
+								<li class="swiper-slide"><a href="#">BODY</a></li>
+								<li class="swiper-slide"><a href="#">HAIR</a></li>
+								<li class="swiper-slide"><a href="#">MAKE-UP</a></li>
+								<li class="swiper-slide"><a href="#">FRAGRANCE</a></li>
+								<li class="swiper-slide"><a href="#">MAN</a></li>
+								<li class="swiper-slide"><a href="#">TOOL&amp;ACC</a></li>
+								<li class="swiper-slide"><a href="#">FOOD/LIVING</a></li>
+							</ul>
+						</div>
+						<div class="list-group">
+							<ul class="mlist5v-goods">
+								<li>
+									<a href="#none">
+										<span class="ranking"><em>1</em>위</span>
+										<span class="img"><img src="/mc-static-root/image/temp/@thum220x220_01.png" alt=""></span>
+										<span class="txtus">
+											<span class="tit">닥터자르트</span>
+											<span class="txt">세라마이딘 마스크</span>
+											<span class="price">
+												<span class="sale">4,000<em>원</em></span>
+												<span class="won">2,000<em>원</em></span>
+											</span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</span>
+									</a>
+									<button type="button" class="jeem">찜하기</button>
+								</li>
+								<li>
+									<a href="#none">
+										<span class="ranking"><em>2</em>위</span>
+										<span class="img">
+											<img src="/mc-static-root/image/temp/@thum220x220_02.png" alt="">
+											<span class="soldOut">일시품절</span>
+										</span>
+										<span class="txtus">
+											<span class="tit">키스미</span>
+											<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+											<span class="price">
+												<span class="sale">4,000<em>원</em></span>
+												<span class="won">2,000<em>원</em></span>
+											</span>
+											<span class="icon">
+												<span class="sale">세일</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</span>
+									</a>
+									<button type="button" class="jeem mClick">찜하기</button>
+								</li>
+							</ul>
+							<button type="button" class="btnLinkMore2"><span>카테고리 더보기</span></button>
+						</div>
+						<!-- //카테고리 BEST end -->
+
+						<!-- 2020-07-29 올알랭 가이드 -->
+						<!-- ↓ 올알랭 가이드 ("올"리브영이 "알"려주는 "랭"킹) -->
+						<h2 class="home-stit-18">올알랭 가이드</h2>
+						<div class="allalain">
+							<!--↓ 영상 제목 -->
+							<h3 class="tit-allalain">잡티를 가려줄 강력 컨실러 TOP 5</h3>
+
+							<!-- ↓ 영상 -->
+							<div id="yt-player"></div>
+
+							<h4 class="tit-allalain-s">컨실러 1위 ~ 2위</h4>
+							<div class="prd-cont active">
+
+								<!-- ↓ item -->
+								<div class="prd-item">
+									<div class="prd-thumb">
+										<img src="https://image.oliveyoung.co.kr/uploads/images/goods/550/10/0000/0013/A00000013778701ko.jpg?l=ko" alt="@썸네일">
+										<button type="button" class="time-stamp" data-timeline="93">01:33</button>
+									</div>
+									<div class="prd-detail">
+										<a href="#" class="prd-link">
+											<strong class="prd-brand">올리브영</strong>
+											<span class="prd-name">쉬즈라인 겨드랑이 땀패드(5쌍) 남녀 공용 겨드랑이 패드 옷 얼룩짐 방지 슬림한 두께감</span>
+										</a>
+										<div class="price-wrap">
+											<span class="strike">53,000원</span>
+											<strong class="price">832,000원</strong>
+											<button type="button" class="prd-cart">장바구니</button>
+										</div>
+									</div>
+								</div>
+								<!-- ↑ item -->
+
+								<h5 class="tit-allalain-ss">함께쓰면 좋을 꿀 조합템</h5>
+								<div class="addon">
+
+									<!-- ↓ item -->
+									<div class="prd-item">
+										<div class="prd-thumb">
+											<img src="https://image.oliveyoung.co.kr/uploads/images/display/90000010001/139/3242182483914317772.jpg" alt="@썸네일">
+										</div>
+										<div class="prd-detail">
+											<a href="#" class="prd-link">
+												<strong class="prd-brand">보타닉힐보 아이디얼포맨</strong>
+												<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝 멀티 태스커 파운데이션 미니 메이크업</span>
+											</a>
+										</div>
+									</div>
+									<!-- ↑ item -->
+
+									<!-- ↓ item -->
+									<div class="prd-item">
+										<div class="prd-thumb">
+											<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+										</div>
+										<div class="prd-detail">
+											<a href="#" class="prd-link">
+												<strong class="prd-brand">불독</strong>
+												<span class="prd-name">미니 파운데이션</span>
+											</a>
+										</div>
+									</div>
+									<!-- ↑ item -->
+
+								</div>
+							</div>
+
+							<div class="prd-cont">
+								<!-- ↓ item -->
+								<div class="prd-item">
+									<div class="prd-thumb">
+										<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+										<button type="button" class="time-stamp" data-timeline="615">10:15</button>
+									</div>
+									<div class="prd-detail">
+										<a href="#" class="prd-link">
+											<strong class="prd-brand">보타닉힐보 아이디얼포맨</strong>
+											<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝 멀티 태스커 파운데이션 미니 메이크업</span>
+										</a>
+										<div class="price-wrap">
+											<span class="strike">53,000원</span>
+											<strong class="price">832,000원</strong>
+											<button type="button" class="prd-cart">장바구니</button>
+										</div>
+									</div>
+								</div>
+								<!-- ↑ item -->
+							</div>
+
+							<h4 class="tit-allalain-s">쿠션부문 1위</h4>
+
+							<div class="prd-cont">
+								<!-- ↓ item -->
+								<div class="prd-item">
+									<div class="prd-thumb">
+										<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+										<button type="button" class="time-stamp" data-timeline="305">05:05</button>
+									</div>
+									<div class="prd-detail">
+										<a href="#" class="prd-link">
+											<strong class="prd-brand">웨이크메이크</strong>
+											<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝</span>
+										</a>
+										<div class="price-wrap">
+											<span class="strike">53,000원</span>
+											<strong class="price">832,000원</strong>
+											<button type="button" class="prd-cart">장바구니</button>
+										</div>
+									</div>
+								</div>
+								<!-- ↑ item -->
+							</div>
+
+							<h4 class="tit-allalain-s">파운데이션부문 1위</h4>
+
+							<div class="prd-cont">
+								<!-- ↓ item -->
+								<div class="prd-item">
+									<div class="prd-thumb">
+										<img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt="@썸네일">
+										<button type="button" class="time-stamp" data-timeline="361">06:01</button>
+									</div>
+									<div class="prd-detail">
+										<a href="#" class="prd-link">
+											<strong class="prd-brand">웨이크메이크</strong>
+											<span class="prd-name">[온라인 단독] 웨이크메이크 디파이닝</span>
+										</a>
+										<div class="price-wrap">
+											<span class="strike">53,000원</span>
+											<strong class="price">832,000원</strong>
+											<button type="button" class="prd-cart">장바구니</button>
+										</div>
+									</div>
+								</div>
+								<!-- ↑ item -->
+							</div>
+
+						</div>
+
+						<script>
+							// @조상혁님, 쓸데 없는 주석이나 가공 해야 할 부분이 많을 수 있습니다.
+							// https://developers.google.com/youtube/iframe_api_reference
+							// 해당 링크 데모로 수정한 스크립트 입니다.
+
+							// 2. This code loads the IFrame Player API code asynchronously.
+							var tag = document.createElement('script');
+						
+							tag.src = "https://www.youtube.com/iframe_api";
+							var firstScriptTag = document.getElementsByTagName('script')[0];
+							firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+						
+							// 3. This function creates an <iframe> (and YouTube player)
+							//    after the API code downloads.
+							var player;
+							function onYouTubeIframeAPIReady() {
+								player = new YT.Player('yt-player', {
+									height: '480',
+									width: '640',
+									videoId: 'X68lVgY3MQI',
+									playerVars: {
+										'playsinline': 1		//인라인으로 재생 (전체화면 아닌)
+									},
+									events: {
+										'onReady': onPlayerReady,
+										'onStateChange': onPlayerStateChange
+									}
+								});
+							}
+						
+							// 4. The API will call this function when the video player is ready.
+							function onPlayerReady(event) {
+								let isScroll = true;
+								let networkcondition = "wifi";
+								let intViewportHeight = $(window).innerHeight();
+								let YTArea = $("#yt-player");
+								let some1 = YTArea.offset().top;							// 아래에 걸린 경우
+								let some2 = some1 + YTArea.height() - intViewportHeight;	// 위에 걸린 경우
+								if ( $(window).scrollTop() <= some1 && $(window).scrollTop() >= some2 ) {
+									//로드 될 때 화면에 보이니?
+									event.target.playVideo();
+									isScroll = false;
+								} else {
+									//로드 될 때 안보이니?
+									if ( networkcondition === "wifi" ) {
+										//와이파이니?
+										$(window).on("scroll", function(){
+											scrollTop = $(window).scrollTop();
+											if ( isScroll && scrollTop <= some1 && scrollTop >= some2 ) {
+												//스크롤 할 때 화면에 보이니?
+												event.target.playVideo();
+												isScroll = false;
+											};
+										});
+									};
+								};
+							}
+
+							// 5. The API calls this function when the player's state changes.
+							var done = false;
+							function onPlayerStateChange(event) {
+								if (event.data == YT.PlayerState.PLAYING && !done) {
+									//재생 중인데 !done 이니?
+									// setTimeout(stopVideo, 6000);
+									done = true;
+								} else if (event.data == YT.PlayerState.ENDED) {
+									//끝났니? 멈출래?
+									player.setLoop(false);
+									//player.setLoop(loopPlaylists:Boolean):Void
+									// player.stopVideo(0);
+								}
+							}
+							function stopVideo() {
+								player.stopVideo();
+							}
+							$(function(){
+								//타임스탬프
+								let btnTimeStamp = $(".allalain .time-stamp");
+								btnTimeStamp.on("click touch", function(){
+									let seekto = $(this).attr("data-timeline");
+									if ( seekto ) {
+										//player.seekTo(seconds:Number, allowSeekAhead:Boolean):Void
+										player.seekTo(seekto, true);
+									} else {
+										if ( !YT.PlayerState.PLAYING ) {
+											player.playVideo();
+										};
+									};
+								});
+
+								//[TEST] scrollTop 확인용 
+								let pastSCR;
+								let currentSCR;
+								let printSCR;
+								$(window).scroll(function(){
+									printSCR = setInterval(function(){
+										currentSCR = $(window).scrollTop();
+										if ( pastSCR !== currentSCR ) {
+											// console.log(currentSCR);
+											pastSCR = currentSCR;
+										} else {
+											clearInterval(printSCR);
+										};
+									}, 500);
+								});
+							});
+						</script>
+						<!-- ↑ 올알랭 가이드 -->
+
+						<!-- 온리원 개편 S -->
+						<div class="onlyOne2020">
+							<h4 class="tit">온리원! 오직 올리브영에서만</h4>
+							<ul class="inner">
+								<li>
+									<div class="thum">
+										<span class="flag"><em>올영</em> ONLY</span>
+										<img src="/mc-static-root/image/temp/@thum_165_120.jpg" alt="">
+									</div>
+									<dl class="txt">
+										<dt>디렉터파이’s pick</dt>
+										<dd>진정천재 사철쑥</dd>
+									</dl>
+								</li>
+								<li>
+									<div class="thum">
+										<span class="flag"><em>올영</em> ONLY</span>
+										<img src="/mc-static-root/image/temp/@thum_165_120.jpg" alt="">
+									</div>
+									<dl class="txt">
+										<dt>디렉터파이’s pick</dt>
+										<dd>진정천재 사철쑥</dd>
+									</dl>
+								</li>
+								<li>
+									<div class="thum">
+										<span class="flag"><em>올영</em> ONLY</span>
+										<img src="/mc-static-root/image/temp/@thum_165_120.jpg" alt="">
+									</div>
+									<dl class="txt">
+										<dt>디렉터파이’s pick</dt>
+										<dd>진정천재 사철쑥</dd>
+									</dl>
+								</li>
+								<li>
+									<div class="thum">
+										<span class="flag"><em>올영</em> ONLY</span>
+										<img src="/mc-static-root/image/temp/@thum_165_120.jpg" alt="">
+									</div>
+									<dl class="txt">
+										<dt>디렉터파이’s pick</dt>
+										<dd>진정천재 사철쑥</dd>
+									</dl>
+								</li>
+								<li>
+									<div class="thum">
+										<span class="flag"><em>올영</em> ONLY</span>
+										<img src="/mc-static-root/image/temp/@thum_165_120.jpg" alt="">
+									</div>
+									<dl class="txt">
+										<dt>디렉터파이’s pick</dt>
+										<dd>진정천재 사철쑥</dd>
+									</dl>
+								</li>
+								<li>
+									<div class="thum">
+										<span class="flag"><em>올영</em> ONLY</span>
+										<img src="/mc-static-root/image/temp/@thum_165_120.jpg" alt="">
+									</div>
+									<dl class="txt">
+										<dt>디렉터파이’s pick</dt>
+										<dd>진정천재 사철쑥</dd>
+									</dl>
+								</li>
+							</ul>
+						</div>
+						<!-- 온리원 개편 E -->
+
+						<!-- 추천상품 stat -->
+						<h2 class="home-stit">이 상품 어때요?</h2>
+						<ul class="mlist1v-goods">
+							<!-- loop 구간 star -->
+							<li>
+								<a href="#none">
+									<span class="imgSmall">
+										<span class="new">신상</span>
+										<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+									</span>
+									<span class="area">
+										<span class="name">페이스인페이스</span>
+										<span class="text">히로인 메이크 스무스 리퀴드 아이라이너 브라운히로인 메이크 스무스 리퀴드 아이라이너 브라운</span>
+										<span class="sale">36,000<em>원</em></span>
+										<span class="won">42,000<em>원</em></span>
+										<span class="icon">
+											<span class="plus">1+1</span>
+											<span class="coupon">쿠폰</span>
+											<span class="gift">증정</span>
+											<span class="free">무배</span>
+										</span>
+										<span class="eval"><span class="star"><span style="width:50%;">별점</span></span><em>(100)</em></span>
+									</span>
+								</a>
+								<button type="button" class="jeem">찜하기</button><!-- 찜 on class="mClick" -->
+							</li>
+							<!-- //loop 구간 end -->
+							<li>
+								<a href="#none">
+									<span class="imgSmall">
+										<span class="best">베스트</span>
+										<span class="img"><img src="/mc-static-root/image/temp/@thum220x220_02.png" alt=""></span>
+									</span>
+									<span class="area">
+										<span class="name">페이스인페이스</span>
+										<span class="text">히로인 메이크 스무스 리퀴드 아이라이너 브라운히로인 메이크 스무스 리퀴드 아이라이너 브라운</span>
+										<span class="sale">36,000<em>원</em></span>
+										<span class="won">42,000<em>원</em></span>
+										<span class="icon">
+											<span class="sale">세일</span>
+											<span class="coupon">쿠폰</span>
+											<span class="gift">증정</span>
+											<span class="free">무배</span>
+										</span>
+										<span class="eval"><span class="star"><span style="width:50%;">별점</span></span><em>(100)</em></span>
+									</span>
+								</a>
+								<button type="button" class="jeem mClick">찜하기</button>
+							</li>
+						</ul>
+						<!-- //추천상품 end -->
+
+						<!-- 올리브영 전문관 stat -->
+						<h2 class="home-stit">올리브영 전문관</h2>
+						<ul class="mlist-Jeonmungwan">
+							<li><a href="#">
+								<img src="/mc-static-root/image/temp/@jeonmungwan325x360_01.jpg" alt="">
+								<span class="stit"><span>Premium 전문매장</span><em>프리미엄 명품 화장품</em></span><!-- //2017-02-09 타이틀 안에 span 추가 이하 li 동일// -->
+							</a></li>
+							<li><a href="#">
+								<img src="/mc-static-root/image/temp/@jeonmungwan325x360_02.jpg" alt="">
+								<span class="stit"><span>남성 전문관</span><em>프리미엄 명품 화장품</em></span>
+							</a></li>
+							<li><a href="#">
+								<img src="/mc-static-root/image/temp/@jeonmungwan325x360_03.jpg" alt="">
+								<span class="stit"><span>맘 &amp; 베이비</span><em>프리미엄 명품 화장품</em></span>
+							</a></li>
+							<li><a href="#">
+								<img src="/mc-static-root/image/temp/@jeonmungwan325x360_04.jpg" alt="">
+								<span class="stit"><span>다이어트&amp헬스</span><em>프리미엄 명품 화장품</em></span>
+							</a></li>
+							<li><a href="#">
+								<img src="/mc-static-root/image/temp/@jeonmungwan325x360_05.jpg" alt="">
+								<span class="stit"><span>푸드</span><em>프리미엄 명품 화장품</em></span>
+							</a></li>
+							<li><a href="#">
+								<img src="/mc-static-root/image/temp/@jeonmungwan325x360_06.jpg" alt="">
+								<span class="stit"><span>리빙</span><em>프리미엄 명품 화장품</em></span>
+							</a></li>
+						</ul>
+						<!-- //올리브영 전문관 end -->
+						<!-- 올리브영 전문관 개선 2020-06-25-->
+						<hr class="bline">
+						<div class="main-jeonmungwan">
+							<div id="main-jeonmungwan-list" class="swiper-container">
+								<ul class="swiper-wrapper">
+									<li class="swiper-slide">
+										<a href="javascript:;" class="link">
+											<img src="/mc-static-root/image/temp/@jeonmungwan325x360_06.jpg" alt="펫">
+											<span class="stit">펫</span>
+										</a>
+									</li>
+									<li class="swiper-slide">
+										<a href="javascript:;" class="link">
+											<img src="/mc-static-root/image/temp/@jeonmungwan325x360_06.jpg" alt="더모 코스메틱"/>
+											<span class="stit">더모 코스메틱</span>
+										</a>
+									</li>
+									<li class="swiper-slide">
+										<a href="javascript:;" class="link">
+											<img src="/mc-static-root/image/temp/@jeonmungwan325x360_06.jpg" alt="남성 전문관"/>
+											<span class="stit">남성 전문관</span>
+										</a>
+									</li>
+									<li class="swiper-slide">
+										<a href="javascript:;" class="link">
+											<img src="/mc-static-root/image/temp/@jeonmungwan325x360_06.jpg" alt="식품 전문관"/>
+											<span class="stit">식품 전문관</span>
+										</a>
+									</li>
+									<li class="swiper-slide">
+										<a href="javascript:;" class="link">
+											<img src="/mc-static-root/image/temp/@jeonmungwan325x360_06.jpg" alt="맘베이비"/>
+											<span class="stit">맘&베이비</span>
+										</a>
+									</li>
+									<li class="swiper-slide">
+										<a href="javascript:;" class="link">
+											<img src="/mc-static-root/image/temp/@jeonmungwan325x360_06.jpg" alt="향수디퓨저"/>
+											<span class="stit">향수&디퓨저</span>
+										</a>
+									</li>
+								</ul>
+								<!-- Add Scrollbar -->
+							<div class="swiper-scrollbar"></div>
+							</div>
+						</div>
+						<script>
+						$(document).ready(function(){
+							var jeonmungwanSwiper = new Swiper('#main-jeonmungwan-list', {
+								slidesPerView: 'auto',
+								spaceBetween: 10,
+								scrollbar: '#main-jeonmungwan-list .swiper-scrollbar',
+								scrollbarHide: false,
+							});
+						});
+						</script>
+						<!-- //올리브영 전문관 개선 2020-06-25-->
+
+						<!-- 인기브랜드 star -->
+						<h2 class="home-stit">인기브랜드</h2>
+						<div id="mSub2s-menu" class="swiper-container">
+							<ul class="sub_gnb_cate swiper-wrapper">
+								<li class="swiper-slide on"><a href="#">관리자 메뉴 1</a></li>
+								<li class="swiper-slide"><a href="#">관리자 메뉴 2</a></li>
+								<li class="swiper-slide"><a href="#">관리자 메뉴 3</a></li>
+								<li class="swiper-slide"><a href="#">관리자 메뉴 4</a></li>
+							</ul>
+						</div>
+						<div class="list-group">
+							<ul class="mlist2v-goods mlist2v-best">
+								<!-- loop 구간 star -->
+								<li>
+									<div class="goods">
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="img"><img src="/mc-static-root/image/product/prd_thumb02.png" alt=""></span>
+											</span>
+											<span class="name">페이스인페이스</span>
+											<span class="text">피스 오브 페이스 하이드로 겔마스크</span>
+											<span class="won">42,000<em>원</em></span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="img"><img src="/mc-static-root/image/product/prd_thumb02.png" alt=""></span>
+											</span>
+											<span class="name">바이오더마</span>
+											<span class="text">아토덤 PP밤 500ml</span>
+											<span class="won">42,000<em>원</em></span>
+										</a>
+									</div>
+								</li>
+								<!-- //loop 구간 end -->
+								<li>
+									<div class="goods">
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="img"><img src="/mc-static-root/image/product/prd_thumb02.png" alt=""></span>
+											</span>
+											<span class="name">페이스인페이스</span>
+											<span class="text">피스 오브 페이스 하이드로 겔마스크</span>
+											<span class="won">42,000<em>원</em></span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="img"><img src="/mc-static-root/image/product/prd_thumb02.png" alt=""></span>
+											</span>
+											<span class="name">바이오더마</span>
+											<span class="text">아토덤 PP밤 500ml</span>
+											<span class="won">42,000<em>원</em></span>
+										</a>
+									</div>
+								</li>
+							</ul>
+							<button type="button" class="btnLinkMore2"><span>브랜드 더보기</span></button>
+						</div>
+						<!-- //인기브랜드 end -->
+					</div>
+					<!-- ↑ 홈 -->
+
+					<!-- ↓ 오특 -->
+					<div class="swiper-slide">
+						<div id="mSubGnb1" class="mSubGnb swiper-container">
+							<ul class="sub_gnb_cate swiper-wrapper">
+								<li class="swiper-slide on"><a href="#">전체</a></li>
+								<li class="swiper-slide"><a href="#">기초</a></li>
+								<li class="swiper-slide"><a href="#">메이크업</a></li>
+								<li class="swiper-slide"><a href="#">바디</a></li>
+								<li class="swiper-slide"><a href="#">헤어</a></li>
+								<li class="swiper-slide"><a href="#">향수/디퓨저</a></li>
+								<li class="swiper-slide"><a href="#">건강식품</a></li>
+								<li class="swiper-slide"><a href="#">일반식품</a></li>
+								<li class="swiper-slide"><a href="#">건강/위생용품</a></li>
+								<li class="swiper-slide"><a href="#">잡화</a></li>
+							</ul>
+						</div>
+						<ul class="mlist1v-hot">
+							<!-- loop 구간 star -->
+							<li>
+								<a href="#none">
+									<span class="imgSmall">
+										<!-- 2016-12-16 마크업 추가 -->
+										<span class="flag percent"><em>88%</em>할인</span>
+										<!-- 2017-03-08 Pnum클래스 추가(금액일 경우) -->
+										<span class="flag won"><em class="Pnum">1000원</em>쿠폰</span>
+										<!-- //2017-03-08 Pnum클래스 추가(금액일 경우) -->
+										<!-- //2016-12-16 마크업 추가 -->
+										<span class="img">
+											<img src="/mc-static-root/image/temp/@thum750x400_01.png" alt="">
+										</span>
+									</span>
+									<span class="area">
+										<span class="round"><span># 벌써 세번째 재입고된 라네즈의 스테디셀러! 한정판 판매</span></span><!-- //2016-12-16 텍스트 # 추가// -->
+										<span class="name">보습 필수템</span>
+										<span class="text">겨울 필수품 보습 아이템 20종 기획특가</span>
+										<span class="won">핫딜가 <span>30,600</span><em> 원</em></span>
+										<!-- 2016-12-16 마크업 추가 -->
+										<span class="icon">
+											<span class="gift">증정</span>
+											<span class="free">무배</span>
+										</span>
+										<!-- //2016-12-16 마크업 추가 -->
+									</span>
+								</a>
+							</li>
+							<!-- //loop 구간 end -->
+							<!-- loop 구간 star -->
+							<li>
+								<a href="#none">
+									<span class="imgSmall">
+										<span class="flag percent"><em>88%</em>할인</span>
+										<span class="img">
+										<span class="img">
+											<img src="/mc-static-root/image/temp/@thum750x400_02.png" alt="">
+										</span>
+									</span>
+									<span class="area">
+										<span class="round"><span># 많은분들이 선택한 라네즈의 스테디셀러</span></span><!-- //2016-12-16 텍스트 # 추가// -->
+										<span class="name">클리오</span>
+										<span class="text">킬커버 컨실데이션 기획세트</span>
+										<span class="won">핫딜가 <span>30,600</span><em> 원</em></span>
+									</span>
+								</a>
+							</li>
+							<!-- //loop 구간 end -->
+							<li>
+								<a href="#none">
+									<span class="imgSmall">
+										<span class="flag percent"><em>88%</em>할인</span>
+										<span class="img">
+										<span class="img">
+											<span class="minor"><em>성인인증</em> 후 구매가능</span>
+										</span>
+									</span>
+									<span class="area">
+										<span class="round"><span># 많은분들이 선택한 라네즈의 스테디셀러</span></span><!-- //2016-12-16 텍스트 # 추가// -->
+										<span class="name">사가미</span>
+										<span class="text">사가미 오리지널 6p</span>
+										<span class="won">오늘특가 <span>15,800</span><em> 원</em></span>
+									</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<!-- ↑ 오특 -->
+
+					<!-- ↓ 신상 -->
+					<div class="swiper-slide">
+						<ul class="submain-new">
+							<!-- loop 구간 star -->
+							<li>
+								<a class="image" href="#none">
+									<img src="/mc-static-root/image/temp/@goods750x760_01.jpg" alt="">
+									<span class="area">
+										<span class="subctit">쌀쌀한 요즘</span>
+										<span class="substit">피부 보호를 위한 필수 아이템</span>
+										<span class="subtxt">
+											하루아침에 달라진 날씨에 많이 놀랐죠? 가뜩이나 날씨에 예민한 내 피부를 보호하기 위한 그래서 반드시 사야만 하는 적금을 깨서라도 사채를 내서라도 사야만 하는 머스트잇 울트라 완소 럭셔리 아이템
+										</span>
+									</span>
+								</a>
+								<ul class="mlist3v-goods">
+									<li>
+										<a href="#none">
+											<span class="img"><img src="/mc-static-root/image/temp/@thum220x220_01.png" alt=""></span>
+											<span class="txtus">
+												<span class="tit">닥터자르트</span>
+												<span class="txt">세라마이딘 마스크</span>
+												<span class="price">
+													<span class="sale">4,000<em>원</em></span>
+													<span class="won">2,000<em>원</em></span>
+												</span>
+												<span class="icon">
+													<span class="plus">1+1</span>
+													<span class="coupon">쿠폰</span>
+													<span class="gift">증정</span>
+													<span class="free">무배</span>
+												</span>
+											</span>
+										</a>
+										<button type="button" class="jeem">찜하기</button><!-- //2016-12-21 찜 마크업 추가, 선택시 mClick 클래스 추가// -->
+									</li>
+									<li>
+										<a href="#none">
+											<span class="img"><img src="/mc-static-root/image/temp/@thum220x220_02.png" alt=""></span>
+											<span class="txtus">
+												<span class="tit">키스미</span>
+												<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+												<span class="price">
+													<span class="sale">4,000<em>원</em></span>
+													<span class="won">2,000<em>원</em></span>
+												</span>
+												<span class="icon">
+													<span class="plus">1+1</span>
+													<span class="coupon">쿠폰</span>
+													<span class="gift">증정</span>
+													<span class="free">무배</span>
+												</span>
+											</span>
+										</a>
+										<button type="button" class="jeem mClick">찜하기</button><!-- //2016-12-21 찜 마크업 추가, 선택시 mClick 클래스 추가// -->
+									</li>
+								</ul>
+							</li>
+							<!-- //loop 구간 end -->
+			
+							<li>
+								<a class="image" href="#none">
+									<img src="/mc-static-root/image/temp/@goods750x760_02.jpg" alt="">
+									<span class="area">
+										<span class="subctit">물이 다른 스킨케어</span>
+										<!-- <span class="substit"></span> -->
+										<span class="subtxt">
+											화장품에 들어가는 1％의 성분 대신, 대부분을 차지하는 물에 집중한 스킨케어. 요즘 현대인들이 지향하는 미니멀 라이프에 맞춰, 여러 단계를 거치지 않고 확실한 수분과 보습이 유지되는 딥 워터테라피 라인을 소개합니다. 유·수분에 최적화된 이중 보습 토너부터, 겨울철 건조함을 잡아주는 수분크림까지
+										</span>
+									</span>
+								</a>
+								<ul class="mlist3v-goods">
+									<li>
+										<a href="#none">
+											<span class="img"><img src="/mc-static-root/image/temp/@thum220x220_01.png" alt=""></span>
+											<span class="txtus">
+												<span class="tit">닥터자르트</span>
+												<span class="txt">세라마이딘 마스크</span>
+												<span class="price">
+													<span class="sale">4,000<em>원</em></span>
+													<span class="won">2,000<em>원</em></span>
+												</span>
+												<span class="icon">
+													<span class="plus">1+1</span>
+													<span class="coupon">쿠폰</span>
+													<span class="gift">증정</span>
+													<span class="free">무배</span>
+												</span>
+											</span>
+										</a>
+										<button type="button" class="jeem">찜하기</button><!-- //2016-12-21 찜 마크업 추가, 선택시 mClick 클래스 추가// -->
+									</li>
+									<li>
+										<a href="#none">
+											<span class="img"><img src="/mc-static-root/image/temp/@thum220x220_02.png" alt=""></span>
+											<span class="txtus">
+												<span class="tit">키스미</span>
+												<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+												<span class="price">
+													<span class="sale">4,000<em>원</em></span>
+													<span class="won">2,000<em>원</em></span>
+												</span>
+												<span class="icon">
+													<span class="plus">1+1</span>
+													<span class="coupon">쿠폰</span>
+													<span class="gift">증정</span>
+													<span class="free">무배</span>
+												</span>
+											</span>
+										</a>
+										<button type="button" class="jeem mClick">찜하기</button><!-- //2016-12-21 찜 마크업 추가, 선택시 mClick 클래스 추가// -->
+									</li>
+								</ul>
+							</li>
+			
+							<li>
+								<a class="image" href="#none">
+									<img src="/mc-static-root/image/temp/@goods750x760_03.jpg" alt="">
+									<span class="area">
+										<span class="subctit">캔들과 함께 하는 저녁</span>
+										<!-- <span class="substit"></span> -->
+										<span class="subtxt">
+											캔들의 은은한 향과 함께 시작되는 저녁은 어디인지 모르게 차분한 느낌이 듭니다. 때이른 황사와 미세먼지로부터 민감해진 코를 위해 릴렉스할 수 있는 라운드어라운드 캔들을 소개합니다.
+										</span>
+									</span>
+								</a>
+								<ul class="mlist3v-goods">
+									<li>
+										<a href="#none">
+											<span class="img"><img src="/mc-static-root/image/temp/@thum220x220_01.png" alt=""></span>
+											<span class="txtus">
+												<span class="tit">닥터자르트</span>
+												<span class="txt">세라마이딘 마스크</span>
+												<span class="price">
+													<span class="sale">4,000<em>원</em></span>
+													<span class="won">2,000<em>원</em></span>
+												</span>
+												<span class="icon">
+													<span class="plus">1+1</span>
+													<span class="coupon">쿠폰</span>
+													<span class="gift">증정</span>
+													<span class="free">무배</span>
+												</span>
+											</span>
+										</a>
+										<button type="button" class="jeem">찜하기</button><!-- //2016-12-21 찜 마크업 추가, 선택시 mClick 클래스 추가// -->
+									</li>
+									<li>
+										<a href="#none">
+											<span class="img"><img src="/mc-static-root/image/temp/@thum220x220_02.png" alt=""></span>
+											<span class="txtus">
+												<span class="tit">키스미</span>
+												<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+												<span class="price">
+													<span class="sale">4,000<em>원</em></span>
+													<span class="won">2,000<em>원</em></span>
+												</span>
+												<span class="icon">
+													<span class="plus">1+1</span>
+													<span class="coupon">쿠폰</span>
+													<span class="gift">증정</span>
+													<span class="free">무배</span>
+												</span>
+											</span>
+										</a>
+										<button type="button" class="jeem mClick">찜하기</button><!-- //2016-12-21 찜 마크업 추가, 선택시 mClick 클래스 추가// -->
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+					<!-- ↑ 신상 -->
+
+					<!-- ↓ 베스트 -->
+					<div class="swiper-slide">
+						<!-- ↓ 베스트 탭 -->
+						<div id="mFixTab1" class="mFixTab">
+							<ul id="mTab" class="tabList01 twoSet">
+								<li class="on"><a href="#">판매 베스트</a></li>
+								<li><a href="#" class="btn-review-best">리뷰 베스트</a></li>
+							</ul>
+						</div>
+						<!-- ↑ 베스트 탭 -->
+
+						<!-- ↓ 판매베스트 -->
+						<div id="sellBestDiv" class="tab_contents">
+							<div id="mSubGnb2" class="mSubGnb swiper-container">
+								<ul class="sub_gnb_cate swiper-wrapper">
+									<li class="swiper-slide on"><a href="#">전체</a></li>
+									<li class="swiper-slide"><a href="#">기초</a></li>
+									<li class="swiper-slide"><a href="#">메이크업</a></li>
+									<li class="swiper-slide"><a href="#">바디</a></li>
+									<li class="swiper-slide"><a href="#">헤어</a></li>
+									<li class="swiper-slide"><a href="#">향수/디퓨저</a></li>
+									<li class="swiper-slide"><a href="#">건강식품</a></li>
+									<li class="swiper-slide"><a href="#">일반식품</a></li>
+									<li class="swiper-slide"><a href="#">건강/위생용품</a></li>
+									<li class="swiper-slide"><a href="#">잡화</a></li>
+								</ul>
+							</div>
+							<ul class="mlist2v-goods mlist2v-best">
+								<!-- loop 구간 star -->
+								<li>
+									<div class="goods">
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트<em>01</em></span>
+												<span class="img">
+													<img src="/mc-static-root/image/product/prd_thumb02.png" alt="">
+													<span class="soldOut">품절</span>
+												</span>
+											</span>
+											<span class="name">페이스인페이스</span>
+											<span class="text">피스 오브 페이스 하이드로 겔마스크</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<!-- <span class="free">무배</span> -->
+												<span class="delivery">당일</span>
+											</span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트<em>02</em></span>
+												<span class="img">
+													<!-- <img src="/mc-static-root/image/product/prd_thumb02.png" alt=""> -->
+													<span class="minor"><em>성인인증</em> 후 구매가능</span>
+												</span>
+											</span>
+											<span class="name">바이오더마</span>
+											<span class="text">아토덤 PP밤 500ml</span>
+											<span class="sale mVisi"></span><!-- //세일가 없을시 mVisi 클래스 추가//  -->
+											<span class="won">42,000<em>원</em></span>
+										</a>
+									</div>
+								</li>
+								<!-- //loop 구간 end -->
+			
+								<!-- 상품 리스트 2 -->
+								<li>
+									<div class="goods">
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트<em>10</em></span>
+												<span class="img"><img src="/mc-static-root/image/product/prd_thumb02.png" alt=""></span>
+											</span>
+											<span class="name">페이스인페이스</span>
+											<span class="text">피스 오브 페이스 하이드로 겔마스크</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트<em>100</em></span>
+												<span class="img"><img src="/mc-static-root/image/product/prd_thumb02.png" alt=""></span>
+											</span>
+											<span class="name">바이오더마</span>
+											<span class="text">아토덤 PP밤 500ml</span>
+											<span class="sale mVisi"></span><!-- //세일가 없을시 mVisi 클래스 추가//  -->
+											<span class="won">42,000<em>원</em></span>
+										</a>
+									</div>
+								</li>
+								<!-- //상품 리스트 2 -->
+			
+								<!-- 상품 리스트 3 -->
+								<li>
+									<div class="goods">
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트<em>100</em></span>
+												<span class="img"><img src="/mc-static-root/image/product/prd_thumb02.png" alt=""></span>
+											</span>
+											<span class="name">페이스인페이스</span>
+											<span class="text">피스 오브 페이스 하이드로 겔마스크</span>
+											<span class="sale mHide"></span><!-- //세일가 둘다 없을시 mHide 클래스 추가//  -->
+											<span class="won">42,000<em>원</em></span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트<em>100</em></span>
+												<span class="img"><img src="/mc-static-root/image/product/prd_thumb02.png" alt=""></span>
+											</span>
+											<span class="name">바이오더마</span>
+											<span class="text">아토덤 PP밤 500ml</span>
+											<span class="sale mHide"></span><!-- //세일가 없을시 mHide 클래스 추가//  -->
+											<span class="won">42,000<em>원</em></span>
+										</a>
+									</div>
+								</li>
+								<!-- //상품 리스트 3 -->
+							</ul>
+						</div>
+						<!-- ↑ 판매베스트 -->
+
+						<!-- ↓ 리뷰베스트 -->
+						<div id="reviewBestDiv" class="tab_contents">
+							<div class="best_wrap">
+								<div class="tit_hn lineBz">
+									<h3 class="tit">오늘의 도움 리뷰</h3>
+									<button type="button" class="btn_info" onclick="layTooltip('lay_tooltip_01');">오늘의 도움 리뷰 레이어 팝업</button>
+									<div class="lay_tooltip" id="lay_tooltip_01">
+										<p class="txt">최근 90일 동안 가장 많은<br>"도움이 돼요"를 받은 리뷰 입니다.</p>
+										<button type="button" class="btnClose" onclick="layTooltipClose('lay_tooltip_01');">닫기</button>
+									</div>
+								</div>
+								<div class="review_best_slide swiper-container">
+									<ul class="list_slider swiper-wrapper">
+										<li class="swiper-slide">
+											<a href="#">
+												<img src="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0000/A00000000927101ko.jpg" class="bothum" alt="">
+												<div class="dimbox">
+													<p class="txt">닥터지 레드 블레미쉬 클리 토너 재구매 의사있어요!!</p>
+													<p class="like">1,800회</p>
+												</div>
+											</a>
+										</li>
+										<li class="swiper-slide">
+											<a href="#">
+												<img src="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0000/A00000000927101ko.jpg?RS=155x155" class="thum" alt="">
+												<div class="dimbox">
+													<p class="txt">닥터지 레드 블레미쉬 클리 토너 재구매 의사있어요!!닥터지 레드 블레미쉬 클리 토너 재구매 의사있어요!!</p>
+													<p class="like">1,800회</p>
+												</div>
+											</a>
+										</li>
+										<li class="swiper-slide">
+											<a href="#">
+												<img src="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0000/A00000000927101ko.jpg?RS=155x155" class="thum" alt="">
+												<div class="dimbox">
+													<p class="txt">닥터지 레드 블레미쉬 클리 토너 재구매 의사있어요!!닥터지 레드 블레미쉬 클리 토너 재구매 의사있어요!!</p>
+													<p class="like">1,800회</p>
+												</div>
+											</a>
+										</li>
+										<li class="swiper-slide">
+											<a href="#">
+												<img src="https://qaimage.oliveyoung.co.kr/uploads/images/goods/400/10/0000/0000/A00000000927101ko.jpg?RS=155x155" class="thum" alt="">
+												<div class="dimbox">
+													<p class="txt">닥터지 레드 블레미쉬 클리 토너 재구매 의사있어요!!닥터지 레드 블레미쉬 클리 토너 재구매 의사있어요!!</p>
+													<p class="like">1,800회</p>
+												</div>
+											</a>
+										</li>
+										<li class="swiper-slide last">
+											<a href="#">
+												<div class="dimbox">
+													<p class="txt">더 많은 리뷰를 <br>보고 싶으세요?</p>
+													<p class="like">&nbsp;</p>
+												</div>
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+
+							<div class="lineBoxType">
+								<div class="tit_hn">
+									<h3 class="tit">이번주 별점 랭킹</h3>
+									<button type="button" class="btn_info" onclick="layTooltip('lay_tooltip_02');">나의 피부 컨디션 소개 레이어 팝업</button>
+									<div class="lay_tooltip" id="lay_tooltip_02">
+										<p class="txt">지난주 가장 높은 별점을 받은 <br>상품입니다.</p>
+										<button type="button" class="btnClose" onclick="layTooltipClose('lay_tooltip_02');">닫기</button>
+									</div>
+									<select class="selbox type01" title="정렬 옵션을 선택하세요.">
+										<option selected="selected">건강&amp;위생용품</option>
+										<option>전체</option>
+										<option>전체</option>
+										<option>전체</option>
+										<option>전체</option>
+										<option>전체</option>
+									</select>
+								</div><!--//tit_hn-->
+
+								<div class="review_best_list">
+									<ul class="inner">
+										<li>
+											<a href="#">
+											<p class="gnum">
+												<span class="num">01</span><br>
+												<span class="updw up">↑ 186</span>
+											</p>
+											<div class="item_box">
+												<div class="item clrfix">
+													<p class="thum"><img src="/mc-static-root/image/mypage/@mypage140x140_01.jpg" alt=""></p>
+													<dl class="txt">
+														<dt>라운드어라운드</dt>
+														<dd>라운드어라운드</dd>
+														<dd class="price"><del>24,700원</del><strong>23,470</strong>원</dd>
+														<dd class="icon_area"><span class="icon"><span class="sale">세일</span><span class="gift">증정</span></span></dd>
+													</dl>
+												</div>
+												<div class="star_info clrfix">
+													<div class="star_box clrfix">
+														<ul class="star_list">
+															<li><span class="rating"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:80%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:60%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:40%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:20%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+														</ul>
+														<em>4.0</em>
+													</div>
+													<p class="views">누적 리뷰 <span>14,332</span>건</p>
+												</div>
+											</div>
+											</a>
+										</li><!--//loop-->
+										<li>
+											<a href="#">
+											<p class="gnum">
+												<span class="num">02</span><br>
+												<span class="updw dw">↓ 123</span>
+											</p>
+											<div class="item_box">
+												<div class="item clrfix">
+													<p class="thum"><img src="/mc-static-root/image/mypage/@mypage140x140_01.jpg" alt=""></p>
+													<dl class="txt">
+														<dt>라운드어라운드</dt>
+														<dd>라운드어라운드라운드어라운드라운드어라운드라운드어라운드라운드어라운드라운드어라운드</dd>
+														<dd class="price"><del>24,700원</del><strong>23,470</strong>원</dd>
+														<dd class="icon_area"><span class="icon"><span class="sale">세일</span><span class="gift">증정</span></span></dd>
+													</dl>
+												</div>
+												<div class="star_info clrfix">
+													<div class="star_box clrfix">
+														<ul class="star_list">
+															<li><span class="rating"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:80%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:60%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:40%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:20%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+														</ul>
+														<em>4.0</em>
+													</div>
+													<p class="views">누적 리뷰 <span>14,332</span>건</p>
+												</div>
+											</div>
+											</a>
+										</li>
+										<li>
+											<a href="#">
+											<p class="gnum">
+												<span class="num">03</span><br>
+												<span class="updw new">NEW</span>
+											</p>
+											<div class="item_box">
+												<div class="item clrfix">
+													<p class="thum"><img src="/mc-static-root/image/mypage/@mypage140x140_01.jpg" alt=""></p>
+													<dl class="txt">
+														<dt>라운드어라운드</dt>
+														<dd>라운드어라운드라운드어라운드라운드어라운드라운드어라운드라운드어라운드라운드어라운드</dd>
+														<dd class="price"><del>24,700원</del><strong>23,470</strong>원</dd>
+														<dd class="icon_area"><span class="icon"><span class="sale">세일</span><span class="gift">증정</span></span></dd>
+													</dl>
+												</div>
+												<div class="star_info clrfix">
+													<div class="star_box clrfix">
+														<ul class="star_list">
+															<li><span class="rating"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:80%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:60%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:40%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:20%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+														</ul>
+														<em>4.0</em>
+													</div>
+													<p class="views">누적 리뷰 <span>14,332</span>건</p>
+												</div>
+											</div>
+											</a>
+										</li>
+										<li>
+											<a href="#">
+											<p class="gnum">
+												<span class="num">100</span><br>
+												<span class="updw new">NEW</span>
+											</p>
+											<div class="item_box">
+												<div class="item clrfix">
+													<p class="thum"><img src="/mc-static-root/image/mypage/@mypage140x140_01.jpg" alt=""></p>
+													<dl class="txt">
+														<dt>라운드어라운드</dt>
+														<dd>라운드어라운드라운드어라운드라운드어라운드라운드어라운드라운드어라운드라운드어라운드</dd>
+														<dd class="price"><del>24,700원</del><strong>23,470</strong>원</dd>
+														<dd class="icon_area"><span class="icon"><span class="sale">세일</span><span class="gift">증정</span></span></dd>
+													</dl>
+												</div>
+												<div class="star_info clrfix">
+													<div class="star_box clrfix">
+														<ul class="star_list">
+															<li><span class="rating"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:80%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:60%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:40%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+															<li><span class="rating" style="width:20%;"></span><img src="/mc-static-root/image/product/bg_rating_star.png"></li>
+														</ul>
+														<em>4.0</em>
+													</div>
+													<p class="views">누적 리뷰 <span>14,332</span>건</p>
+												</div>
+											</div>
+											</a>
+										</li>
+									</ul>
+								</div>
+
+
+							</div><!--//lineBoxType-->
+						</div>
+						<!-- ↑ 리뷰베스트 -->
+
+					</div>
+					<!-- ↑ 베스트 -->
+
+					<!-- ↓ 기획전 -->
+					<div class="swiper-slide">
+						<div id="mSubGnb3" class="mSubGnb swiper-container">
+							<ul class="sub_gnb_cate swiper-wrapper">
+								<li class="swiper-slide on"><a href="#">전체</a></li>
+								<li class="swiper-slide"><a href="#">기초</a></li>
+								<li class="swiper-slide"><a href="#">메이크업</a></li>
+								<li class="swiper-slide"><a href="#">바디</a></li>
+								<li class="swiper-slide"><a href="#">헤어</a></li>
+								<li class="swiper-slide"><a href="#">향수/디퓨저</a></li>
+								<li class="swiper-slide"><a href="#">건강식품</a></li>
+								<li class="swiper-slide"><a href="#">일반식품</a></li>
+								<li class="swiper-slide"><a href="#">건강/위생용품</a></li>
+								<li class="swiper-slide"><a href="#">잡화</a></li>
+							</ul>
+						</div>
+						<ul class="mlist2v-goods plan">
+							<!-- loop 구간 star -->
+							<li>
+							<h2 class="stit" style="background:#f6efe9;"><!-- 2017-01-05 관리자 칼라 등록 -->
+									<span>오빠들의 잇 아이템</span>
+									남자도 피부관리 해야지 말입니다
+								</h2>
+								<div class="imgBig"><img src="/mc-static-root/image/temp/@thum750x500_01.jpg" alt=""></div>
+								<div class="goods" style="background:#f6efe9;"><!-- 2016-11-25 수정 -->
+									<div><!-- 2017-02-16 DIV 태그삽입 열림 -->
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml오리지널 수분크림100ml</span>
+											<span class="sale mVisi"></span><!-- //세일가 없을시 mVisi 클래스 추가//  -->
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="delivery">오늘드림</span>
+												<!-- <span class="free">무배</span> -->
+											</span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="new">신상</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+									</div><!-- //2017-02-16 DIV 태그삽입 닫힘 -->
+								</div>
+							</li>
+							<!-- //loop 구간 end -->
+		
+							<!-- 상품 리스트 2 -->
+							<li>
+								<h2 class="stit" style="background:#ddf9d8;"><!-- 2017-01-05 관리자 칼라 등록 -->
+									<span>대세는 탄산수</span>
+									스타일리쉬한 수분충전 에너지
+								</h2>
+								<div class="imgBig"><img src="/mc-static-root/image/temp/@thum750x500_02.jpg" alt=""></div>
+								<div class="goods" style="background:#ddf9d8;"><!-- 2016-11-25 수정 -->
+									<div><!-- 2017-02-16 DIV 태그삽입 열림 -->
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="mHide"></span><!-- //세일가 둘다 없을시 mHide 클래스 추가//  -->
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="new">신상</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="mHide"></span><!-- //세일가 둘다 없을시 mHide 클래스 추가//  -->
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+									</div><!-- //2017-02-16 DIV 태그삽입 닫힘 -->
+								</div>
+							</li>
+							<!-- //상품 리스트 2 -->
+		
+							<!-- 상품 리스트 3 -->
+							<li>
+								<h2 class="stit" style="background:#f7e3e3;"><!-- 2017-01-05 관리자 칼라 등록 -->
+									<span>민효린의 FW메이크업</span>
+									강렬한 색감과 숨막힐 듯한 반짝임
+								</h2>
+								<div class="imgBig"><img src="/mc-static-root/image/temp/@thum750x500_03.jpg" alt=""></div>
+								<div class="goods" style="background:#f7e3e3;"><!-- 2016-11-25 수정 -->
+									<div><!-- 2017-02-16 DIV 태그삽입 열림 -->
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="new">신상</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+									</div><!-- //2017-02-16 DIV 태그삽입 닫힘 -->
+								</div>
+							</li>
+							<!-- //상품 리스트 3 -->
+		
+							<!-- 상품 리스트 4 -->
+							<li>
+								<h2 class="stit" style="background:#dbf7f1;"><!-- 2017-01-05 관리자 칼라 등록 -->
+									<span>나를 가꾸는 시간</span>
+									까다로운 내가 선택한 브랜드
+								</h2>
+								<div class="imgBig"><img src="/mc-static-root/image/temp/@thum750x500_04.jpg" alt=""></div>
+								<div class="goods" style="background:#dbf7f1;"><!-- 2016-11-25 수정 -->
+									<div><!-- 2017-02-16 DIV 태그삽입 열림 -->
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="new">신상</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+									</div><!-- //2017-02-16 DIV 태그삽입 닫힘 -->
+								</div>
+							</li>
+							<!-- //상품 리스트 4 -->
+		
+							<!-- 상품 리스트 5 -->
+							<li>
+								<h2 class="stit" style="background:#fffbd2;"><!-- 2017-01-05 관리자 칼라 등록 -->
+									<span>누구나 꿈꾸는 꿈의 보습</span>
+									가을 피부 닥터자르트로 수분 보충
+								</h2>
+								<div class="imgBig"><img src="/mc-static-root/image/temp/@thum750x500_05.jpg" alt=""></div>
+								<div class="goods" style="background:#fffbd2;"><!-- 2016-11-25 수정 -->
+									<div><!-- 2017-02-16 DIV 태그삽입 열림 -->
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="new">신상</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+									</div><!-- //2017-02-16 DIV 태그삽입 닫힘 -->
+								</div>
+							</li>
+							<!-- //상품 리스트 5 -->
+		
+							<!-- 상품 리스트 6 -->
+							<li>
+								<h2 class="stit" style="background:#e6feff;"><!-- 2017-01-05 관리자 칼라 등록 -->
+									<span>ALL IN ONE ITEM</span>
+									머리부터 발끝까지 한번에 해결
+								</h2>
+								<div class="imgBig"><img src="/mc-static-root/image/temp/@thum750x500_06.jpg" alt=""></div>
+								<div class="goods" style="background:#e6feff;"><!-- 2016-11-25 수정 -->
+									<div><!-- 2017-02-16 DIV 태그삽입 열림 -->
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="best">베스트</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+										<a href="#none">
+											<span class="imgSmall">
+												<span class="new">신상</span>
+												<span class="img"><img src="/mc-static-root/image/temp/@thum320x320_0101.png" alt=""></span>
+											</span>
+											<span class="name">불독</span>
+											<span class="text">오리지널 수분크림100ml</span>
+											<span class="sale">36,000<em>원</em></span>
+											<span class="won">42,000<em>원</em></span>
+											<span class="icon">
+												<span class="plus">1+1</span>
+												<span class="coupon">쿠폰</span>
+												<span class="gift">증정</span>
+												<span class="free">무배</span>
+											</span>
+										</a>
+									</div><!-- //2017-02-16 DIV 태그삽입 닫힘 -->
+								</div>
+							</li>
+							<!-- //상품 리스트 6 -->
+		
+						</ul>
+					</div>
+					<!-- ↑ 기획전 -->
+
+					<!-- ↓ 이벤트 -->
+					<div class="swiper-slide">
+						<!-- ↓ 이벤트 탭 -->
+						<div id="mFixTab2" class="mFixTab">
+							<ul id="mTab" class="tabList01 threeSet beauty">
+								<li class="on"><a href="#">모든회원</a></li>
+								<li><a href="#">구매회원</a></li>
+								<li><a href="#">올영체험단</a></li>
+							</ul>
+						</div>
+						<!-- ↑ 이벤트 탭 -->
+
+						<!-- ↓ 모든회원 -->
+						<div class="tab_contents">
+							<ul class="main_event_list">
+								<li>
+									<a href="#">
+										<span class="evt_flag flag1">온라인몰&amp;매장</span>
+										<img src="/mc-static-root/image/temp/@event1_1.png" alt="이벤트 이미지" />
+										<span class="evt_tit">올리브영 윈터미션 블랙 쇼핑 미션</span>
+										<span class="evt_desc">3만원 이상 구매시 2천원 할인 + 카카오톡 이모티콘 증정</span>
+										<span class="evt_date">2016.09.30 - 10.23</span>
+									</a>
+								</li>
+								<li>
+									<a href="#">
+										<span class="evt_flag flag2">매장 단독</span>
+										<img src="/mc-static-root/image/temp/@event1_2.png" alt="이벤트 이미지" />
+										<span class="evt_tit">유네스코 소녀교육 캠페인</span>
+										<span class="evt_desc"><span class="tx_eng">Beautiful Mind. Beautiful Change</span></span>
+										<span class="evt_date">2016.09.30 - 10.23</span>
+									</a>
+								</li>
+								<li>
+									<a href="#">
+										<span class="evt_flag flag3">온라인몰 단독</span>
+										<img src="/mc-static-root/image/temp/@event1_3.png" alt="이벤트 이미지" />
+										<span class="evt_tit">월동준비</span>
+										<span class="evt_desc">긴 겨울의 시작! 따뜻한 겨울나기 준비하기</span>
+										<span class="evt_date">2016.09.30 - 10.23</span>
+									</a>
+								</li>
+							</ul>
+							<!-- 당첨자 발표 리스트 영역 -->
+							<div class="tit-area type2 mgT7">
+								<h3 class="tit">당첨자 발표</h3>
+								<button type="button" class="more">더보기</button>
+							</div>
+							<ul class="noticeList noticeList2"><!-- 최대 3개 -->
+								<li>
+									<a href="#" title="당첨자 발표 바로가기">
+										<strong>10월 재방문 1000포인트 추가 적립 이벤트</strong>
+										<span>당첨자 발표일</span><span>2016.10.27</span>
+									</a>
+								</li>
+								<li>
+									<a href="#" title="당첨자 발표 바로가기">
+										<strong>온라인몰 신라스테이 숙박권 사은품 이벤트</strong>
+										<span>당첨자 발표일</span><span>2016.10.27</span>
+									</a>
+								</li>
+								<li>
+									<a href="#" title="당첨자 발표 바로가기">
+										<strong>온라인몰 뽀로로 댓글달기 이벤트</strong>
+										<span>당첨자 발표일</span><span>2016.10.27</span>
+									</a>
+								</li>			
+							</ul>
+							<!-- //당첨자 발표 리스트 영역 -->
+						</div>
+						<!-- ↑ 모든회원 -->
+
+						<!-- ↓ 구매회원 -->
+						<div class="tab_contents">
+							<ul class="main_event_list">
+								<li>
+									<a href="#">
+										<img src="/mc-static-root/image/temp/@event2_1.png" alt="이벤트 이미지" />
+										<span class="evt_tit">올리브영 모바일 페스티벌</span>
+										<span class="evt_desc">모바일 쇼핑 입덕 프로젝트</span>
+										<span class="evt_date">2016.09.30 - 10.23</span>
+									</a>
+								</li>
+								<li>
+									<a href="#">
+										<img src="/mc-static-root/image/temp/@event2_2.png" alt="이벤트 이미지" />
+										<span class="evt_tit">비오는 날엔 뽀송한 온라인 쇼핑</span>
+										<span class="evt_desc">비오는 날 찾아오는 선착순 혜택</span>
+										<span class="evt_date">2016.09.30 - 10.23</span>
+									</a>
+								</li>
+							</ul>
+							<!-- 당첨자 발표 리스트 영역 -->
+							<div class="tit-area type2 mgT7">
+								<h3 class="tit">당첨자 발표</h3>
+								<button type="button" class="more">더보기</button>
+							</div>
+							<ul class="noticeList noticeList2"><!-- 최대 3개 -->
+								<li>
+									<a href="#" title="당첨자 발표 바로가기">
+										<strong>10월 재방문 1000포인트 추가 적립 이벤트</strong>
+										<span>당첨자 발표일</span><span>2016.10.27</span>
+									</a>
+								</li>
+								<li>
+									<a href="#" title="당첨자 발표 바로가기">
+										<strong>온라인몰 신라스테이 숙박권 사은품 이벤트</strong>
+										<span>당첨자 발표일</span><span>2016.10.27</span>
+									</a>
+								</li>
+								<li>
+									<a href="#" title="당첨자 발표 바로가기">
+										<strong>온라인몰 뽀로로 댓글달기 이벤트</strong>
+										<span>당첨자 발표일</span><span>2016.10.27</span>
+									</a>
+								</li>
+							</ul>
+							<!-- //당첨자 발표 리스트 영역 -->
+						</div>
+						<!-- ↑ 구매회원 -->
+
+						<!-- ↓ 올영체험단 -->
+						<div class="tab_contents">
+							<!-- 이벤트 없을 시 노출 -->
+							<div class="sch_no_data pdzero">
+								<p>진행중인 이벤트가 없습니다</p>
+							</div>
+							<!-- //이벤트 없을 시 노출 -->
+		
+							<div class="tit-area type2 mgT7">
+								<h3 class="tit">당첨자 발표</h3>
+								<button type="button" class="more">더보기</button><!-- //2016-12-16 버튼 노출// -->
+							</div>
+		
+							<!-- 당첨자 발표 없을 시 노출 -->
+							<ul class="noticeList noticeList2">
+								<li class="no_txt_data">
+									당첨자 발표가 없습니다.
+								</li>
+							</ul>
+		
+							<!-- //당첨자 발표 없을 시 노출 -->
+						</div>
+						<!-- ↑ 올영체험단 -->
+					</div>
+					<!-- ↑ 이벤트 -->
+				</div>
+				<!-- ↑ swiper-wrapper -->
+			</div>
+			<!-- ↑ swiper-container -->
+
+		</div>
+		<!-- //#mContents -->
+	</div>
+	<!-- //#mContainer -->
+
+
+
+
+
+
+
+
+
+	<div class="fulsizePop" data-ref-comparekey="90000040003/42/temp_olive_new_bi.gif" style="display:none;top: 0px;" tabindex="0">
+		<div class="box">
+			<div class="video_area">
+				<img src="//image.oliveyoung.co.kr/uploads/contents/201911/29oyawards/mo_popup_banner.jpg" alt="2019 OLiveYoung Awards & Festa" />
+				<div class="innerPos">
+					<div id="promotion-video-player" class="video">
+						<iframe width="100%" height="100%" src="https://www.youtube.com/embed/GJDdBbgJafU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+					</div>
+				</div>
+			</div>
+
+			<div class="btn">
+				<button type="button" class="common_pop_close_oneday">하루동안 보지않기</button>
+				<button type="button" class="common_pop_close">닫기</button>
+			</div>
+		</div>
+	</div><!-- //동영상 버전 -->
+
+
+	<div class="fulsizePop" data-ref-comparekey="90000040003/42/temp_olive_new_bi.gif" style="display:none;top: 0px;" tabindex="0">
+		<div class="box">
+			<img src="https://image.oliveyoung.co.kr/uploads/images/display/90000040003/42/8803955862556087691.jpg" alt="라이브커머스" onclick="javascript:location.href='https://m.oliveyoung.co.kr/m/event/getEventDetail.do?evtNo=00000000006632';">
+			<div class="btn">
+				<button type="button" class="common_pop_close_oneday">하루동안 보지않기</button>
+				<button type="button" class="common_pop_close">닫기</button>
+			</div>
+		</div>
+	</div><!-- //일반 버전 -->
+
+
+
+
+	<!-- #mFooter -->
+	<div id="mFooter">
+		<div class="footer">
+			<h1 class="mTitle1v">씨제이올리브네트웍스 주식회사</h1>
+			<ul class="mlist1v-menu app"><!-- //2017-02-13 app일시 클래스 추가// -->
+				<li><a href="#" title="페이지 이동">로그아웃</a></li>
+				<!-- <li><a href="#" title="페이지 이동"><span>PC</span>버전 보기</a></li> app일시 비노출 -->
+				<li><a href="#" title="페이지 이동">고객센터</a></li>
+			</ul>
+			<p class="addr">
+				대표이사 : 허민호 &nbsp;|&nbsp; 사업자 등록번호 : <span class="inte">104-81-36565</span><br>
+				주소 : 경기도 성남시 분당구 분당로 55 분당퍼스트타워 5층<br>
+				통신판매업신고번호 : 제 <span class="inte">2012</span>-경기성남- <span class="inte">0544</span>호<br>
+				개인정보관리책임자 : 이병록<br>
+				호스팅 제공자 (주) &nbsp;<span class="inte">CJ</span>올리브네트웍스
+			</p>
+			<ul class="mlist2v-menu">
+				<li><span><a href="#" title="페이지 이동">사업자정보확인</a></span></li>
+				<li><span><a href="#" title="페이지 이동">LG U+ 구매안전 서비스</a></span></li>
+			</ul>
+			<h2 class="mTitle2v"><span>올리브영 고객센터</span></h2>
+			<!-- 2017-02-02 마크업 수정 -->
+			<div class="customerInfo">
+				<div class="box">
+					<h3>온라인몰 고객센터</h3>
+					<ul class="mlist3v-menu">
+						<li class="phone"><a href="tel:1522-0882">1522-0882</a></li>
+						<!-- 2017-02-21 수정 inquiry클래스 추가 고객센터 문의하기로 이동 -->
+						<li class="mail inquiry"><a href="#none">1<span>:</span>1 <strong>문의하기</strong></a></li>
+						<!-- //2017-02-21 수정 inquiry클래스 추가 고객센터 문의하기로 이동 -->
+					</ul>
+				</div>
+				<div class="box">
+					<h3>매장 고객센터</h3>
+					<ul class="mlist3v-menu">
+						<li class="phone"><a href="tel:1577-4881">1577-4881</a></li>
+						<li class="mail"><a href="mailto:oliveweb@cj.net">oliveweb@cj.net</a></li>
+					</ul>
+				</div>
+			</div>
+			<!-- //2017-02-02 마크업 수정 -->
+			<h2 class="mTitle3v">올리브영 <span>SNS</span> 공식계정</h2>
+			<ul class="mlist-sns">
+				<li class="facebook"><a href="#" title="페이지 이동">페이스북</a></li>
+				<li class="twitter"><a href="#" title="페이지 이동">트위터</a></li>
+				<li class="kakao"><a href="#" title="페이지 이동">카카오톡 플러스 친구</a></li>
+				<li class="ribyoung"><a href="#" title="페이지 이동">리브영 네이버 카페</a></li>
+				<li class="instagram"><a href="#" title="페이지 이동">인스타그램</a></li>
+			</ul>
+			<p class="copy">© 올리브영 <span>ALL RIGHTS RESERVED</span></p>
+			<ul class="mlist4v-menu">
+				<li><a href="#" title="페이지 이동">이용약관</a></li>
+				<li><a href="#" title="페이지 이동">개인정보처리방침</a></li>
+				<li><a href="#" title="페이지 이동">청소년보호방침</a></li>
+			</ul>
+		</div>
+	</div>
+	<!-- //#mFooter -->
+
+	<div id="fixBtn" class="on">
+		<!-- <a href="#none" class="btnBack"><span>이전 페이지로</span></a> -->
+		<a href="#none" class="btnTop"><span>맨위로</span></a>
+	</div>
+
+	<!-- 스티키 -->
+	<div class="footerTab on lci" id="footerTab">
+		<ul class="list">
+			<li class="item01" id="footerTabCategoy"><a href="javascript:;">카테고리</a></li>
+			<li class="item02" id="footerTabSearch"><a href="javascript:;">검색</a></li>
+			<li class="item03 in" id="footerTabHome"><a href="javascript:;">홈</a></li>
+			<li class="item04"><a href="javascript:;" id="footerTabMypage">마이페이지</a>
+				<div class="main_toast on" id="_gdasGuidePopup" style="display: none;" onclick="location.href='mypage/getGdasList.do';">
+					<div class="toast_con">
+						<span>구매한 상품<br><em>리뷰 작성하세요!</em></span> 
+					</div> 
+				</div>
+			</li>
+			<li class="item05" id="footerTabRecentGoods">
+				<a href="javascript:;">
+					<!-- 최근 본 상품 없는 경우 기존과 동일하게 thum style="display:none;" -->
+					<span class="thum"><img src="https://image.oliveyoung.co.kr/uploads/images/goods/140/10/0000/0011/A00000011627602ko.jpg?l=ko" onerror="common.errorImg(this);" alt="유명상품"></span>
+					최근본상품
+				</a>
+			</li>
+		</ul>
+	</div>
+	<!-- //스티키 -->
+	<!-- 토스트 팝업  오프라인 리뷰 -->
+	<div class="main_toast on" style="display:none;">
+		<div class="toast_con">
+			<span>구매한 상품<br><em>리뷰 작성하세요!</em></span>
+		</div>
+	</div>
+	<!-- //토스트 팝업 -->
+
+</div>
+<!-- //#mWrapper -->
+
+
+<div id="mSearchWrapper">
+	<button>검색레이어 닫기</button>
+
+</div>
+
+<!-- #[3331722]큐레이션 영역 마케팅 활용 동의 수집 내용 변경 -->
+<div class="popLayerWrap" id="curation_agreed">
+	<!-- popLayerArea -->
+	<div class="popLayerArea">
+		<!-- popInner -->
+		<div class="popInner">
+			<div class="popHeader">
+				<h1 class="popTitle">개인정보 수집 및 활용 동의(선택)</h1>
+				<a href="#n" class="btnClose" onclick="popLayerClose('curation_agreed');return false;">닫기</a>
+			</div>
+			<!-- popContainer -->
+			<div class="popContainer">
+				<!-- popCont 스크롤 영역 -->
+				<div class="popCont">
+					<p class="txtbf14">마케팅 활용을 위한 개인정보 수집 및 활용 동의에 동의하시면 상품 추천 서비스를 받으실 수 있습니다.</p>
+					<div class="picBox">
+						<div class="pic_inner">
+							<h3 class="tit">개인정보 수집 및 활용 동의</h3>
+							<p class="txt">이벤트, 쿠폰 및 혜택 등에 대한 정보를 받으시려면 개인정보 수집 및 활용에 대한 동의를 선택하셔야 합니다.</p>
+							<table class="tbl_agree">
+								<caption>개인정보 수집 및 활용 동의</caption>
+								<colgroup>
+									<col style="width:24%;">
+									<col style="width:86%;">
+								</colgroup>
+								<tbody>
+									<tr>
+										<th scope="row">구분</th>
+										<td>
+											<p>선택 항목</p>
+										</td>
+									</tr>
+									<tr>
+										<th scope="row">수집 항목</th>
+										<td>
+											<p>[ 마케팅 활용 동의 시 ]</p>
+											<p>- 고객 맞춤 상품/서비스 제공(상품/서비스/채널이용 내역), 신규 서비스 개발 및 마케팅 활용, 정기간행물 발송을 위한 성명, 생년월일, 성별, 배송주소, 이메일주소, 휴대전화번호</p>
+										</td>
+									</tr>
+									<tr>
+										<th scope="row">보유 기간</th>
+										<td>
+											<p>- 회원 탈퇴 후 30일까지 또는 해당 서비스 동의 철회시까지</p>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="choiceBox mgT20">
+								<p>[개인정보 수집 · 이용목적]</p>
+								<ol class="mgT5 list">
+									<li class="title">마케팅 활용 및 신규 서비스 개발(마케팅 활동 선택 동의 항목)</li>
+									<li>- 회원에 대한 맞춤형 서비스, 각종 편의서비스 및 혜택 제공</li>
+									<li>- 사은/판촉 행사 등 각종 이벤트 행사 관련 정보 안내</li>
+									<li>- 마케팅 및 서비스이용에 대한 분석작업(개별 및 집단 통계분석) 및 신규서비스 개발</li>
+									<li>- 제휴행사 및 서비스 홍보를 위한 마케팅 활용 및 제반 마케팅 활동</li>
+									<li>- 당사, 관계사 제공 상품 및 서비스 안내, 이벤트정보 및 참여기회 제공(SMS, 전자우편, DM , SNS 등), 앱설치 URL 전송 등</li>
+									<li>- 정기간행물의 발송</li>
+									<br>
+									<li>( * 마케팅 활용에 동의하지 않을 수 있지만, 미동의 시 해당 혜택을 받으실 수 없습니다.)</li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					<p class="txtbf13">동의하지 않으실 수 있으나, 개인정보 맞춤 관련 서비스 이용이 제한될 수 있습니다. [마이페이지>회원정보수정]에서 확인 및 동의 변경 가능</p>
+					<div class="txt_center">
+						<button type="button" class="btnGreen">동의</button>
+					</div>
+				</div>
+				<!-- //popCont 스크롤 영역 -->
+			</div>
+			<!-- //popContainer -->
+		</div>
+		<!-- //popInner -->
+	</div>
+	<!-- //popLayerArea -->
+</div>
+<!-- //#[3331722]큐레이션 영역 마케팅 활용 동의 수집 내용 변경 -->
+
+<!-- 전체메뉴 -->
+<div id="allMenu" class="allmenu" tabindex="0"><!--show-->
+	<div id="mLnb">
+
+		<!-- 개인화 정보 2016-12-07 star -->
+		<div class="intro">
+			<!--
+				2019-07-02 등급별 클래스 정의
+				gold / black / green / baby
+			-->
+			<span class="rank green">GREEN OLIVE</span>
+			<span class="name"><span class="ellipsis">일이삼사오</span><em>님</em></span>
+			<a class="setup" href="#none">설정</a>
+			<a class="notice new" href="#none"><em>N</em>알림</a>
+			<button type="button" class="allmenuClose btn-drawer-closer">전체 메뉴 닫기</button>
+		</div>
+		<!-- //개인화 정보 2016-12-07 end -->
+
+		<!-- 2017-03-10 코드수정 -->
+		<div class="shortcuts">
+			<button type="button" class="mypage">마이페이지</button>
+			<button type="button" class="order">주문/배송</button>
+			<button type="button" class="burial">매장안내</button>
+			<button type="button" class="customer">고객센터</button>
+		</div>
+		<!-- //2017-03-10 코드수정 -->
+		<!-- //바로가기 메뉴 end -->
+
+		<!-- 관심매장 등록 star -->
+		<div class="notice-list">
+			<div class="notice-type">
+				<p><strong>홍길동</strong> 님께서 등록하신<br>관심매장에 최근 행사공지가 없습니다.</p>
+				<button type="button" class="btnGrayH28">다른매장 소식보기</button>
+			</div>
+		</div>
+		<!-- //관심매장 등록 end -->
+
+		<!-- 공지사항 star -->
+		<div class="notice-area">
+			<a href="#none">
+				<span class="tit">공지사항</span><span class="txt">CJ ONE 시스템 정기 점검 안내  CJ ONE 시스템 정기 점검 안내CJ ONE 시스템 정기 점검 안내</span>
+			</a>
+		</div>
+
+		<div class="subLink">
+			<p class="mlink"><a href="#" class="new">프리미엄관</a></p>
+		</div>
+		<!-- //공지사항 end -->
+<!-- 2016-12-07 스크립트 수정 -->
+<script type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		$('.lnb_dep1 > li > a').click(function(){
+			if ($(this).parents('li').hasClass('on')){
+				$(this).parents().find('li').removeClass('on');
+			}else {
+				$(this).parents('li').addClass('on').siblings(".lnb_dep1 li").removeClass('on');
+				$('.lnb_dep2 li').removeClass('on');
+			}
+		});
+		$('.lnb_dep2 > li > a').click(function(){
+			if ($(this).parents('.lnb_dep2 li').hasClass('on')){
+				$(this).parents('.lnb_dep2 li').removeClass('on');
+			}else {
+				$(this).parents('.lnb_dep2 li').addClass('on').siblings('.lnb_dep2 li').removeClass('on');
+			}
+		});
+	});
+
+//]]>
+</script>
+<!-- //2016-12-07 스크립트 수정 -->
+		<!-- 2018-04-09 전시카테고리개편 -->
+		<div class="lnbSmenu">
+			<h2 class="lnb_head">카테고리</h2>
+			<div class="lnb_sec">
+				<ul class="lnb_dep1">
+					<li><a href="#;"><span class="new">스킨케어</span></a>
+						<ul class="lnb_dep2">
+							<li><a href="#;"><span class="new">페이셜케어</span></a>
+								<ul class="lnb_dep3">
+									<li><a href="#;"><span class="new">스킨/토너</span></a></li>
+									<li><a href="#;"><span>로션</span></a></li>
+									<li><a href="#;"><span>에센스/세럼</span></a></li>
+									<li><a href="#;"><span>크림</span></a></li>
+									<li><a href="#;"><span>미스트</span></a></li>
+									<li><a href="#;"><span>페이스오일</span></a></li>
+									<li><a href="#;"><span>아이크림/스팟케어</span></a></li>
+									<li><a href="#;"><span>남성올인원</span></a></li>
+									<li><a href="#;"><span>기획세트</span></a></li>
+								</ul>
+							</li>
+							<li><a href="#;"><span>마스크팩</span></a>
+								<ul class="lnb_dep3">
+									<li><a href="#;"><span>마스크팩1</span></a></li>
+									<li><a href="#;"><span>마스크팩2</span></a></li>
+								</ul>
+							</li>
+							<li><a href="#;"><span>클렌징</span></a></li>
+							<li><a href="#;"><span>선케어</span></a></li>
+							<li><a href="#;"><span>더모코스메틱</span></a></li>
+						</ul>
+					</li>
+					<li><a href="#;"><span>메이크업</span></a>
+						<ul class="lnb_dep2">
+							<li><a href="#;"><span>베이스 메이크업</span></a>
+								<ul class="lnb_dep3">
+									<li><a href="#;"><span>메이크업1</span></a></li>
+									<li><a href="#;"><span>메이크업2</span></a></li>
+									<li><a href="#;"><span>메이크업3</span></a></li>
+								</ul>
+							</li>
+							<li><a href="#;"><span>아이 메이크업</span></a></li>
+							<li><a href="#;"><span>메이크업세트</span></a></li>
+							<li><a href="#;"><span>립 메이크업</span></a></li>
+							<li><a href="#;"><span>네일 케어</span></a></li>
+						</ul>
+					</li>
+					<li><a href="#;"><span>바디케어</span></a>
+						<ul class="lnb_dep2">
+							<li><a href="#;"><span>로션/크림</span></a>
+								<ul class="lnb_dep3">
+									<li><a href="#;"><span>로션/크림1</span></a></li>
+								</ul>
+							</li>
+							<li><a href="#;"><span>워시/스크럽</span></a></li>
+							<li><a href="#;"><span>미스트/오일</span></a></li>
+							<li><a href="#;"><span>핸드/풋</span></a></li>
+							<li><a href="#;"><span>립케어</span></a></li>
+							<li><a href="#;"><span>데오/제모</span></a></li>
+						</ul>
+					</li>
+					<li><a href="#;"><span>헤어케어</span></a></li>
+					<li><a href="#;"><span>향수/디퓨져</span></a></li>
+					<li><a href="#;"><span>미용소품</span></a></li>
+					<li><a href="#;"><span>남성</span></a></li>
+					<li><a href="#;"><span>건강/위생용품</span></a></li>
+					<li><a href="#;"><span>건강식품</span></a></li>
+					<li><a href="#;"><span>일반식품</span></a></li>
+					<li><a href="#;"><span>반려동물</span></a></li>
+					<li><a href="#;"><span>베이비</span></a></li>
+					<li><a href="#;"><span>잡화</span></span></a></li>
+				</ul>
+			</div>
+
+		</div>
+		<!-- //lnbSmenu -->
+
+		<!-- 올리브영 전문관 2016-12-22 수정(li안 a태그 두개씩) -->
+		<!-- 올리브영 전문관 2016-12-07 star -->
+		<div class="lnb-jeonmungwan">
+			<h2>올리브영 전문관</h2>
+			<ul>
+				<li>
+					<a href="#">프리미엄 전문매장</a>
+					<a href="#">맘 &amp; 베이비</a>
+				</li>
+				<li>
+					<a href="#">남성관</a>
+					<a href="#">다이어트&amp;헬스</a>
+				</li>
+				<li>
+					<a href="#">FOOD</a>
+					<a href="#">LIVNG</a>
+				</li>
+				<li>
+					<a href="#">향초 전문관</a>
+					<a href="#">펫샵</a>
+				</li>
+				<li>
+					<a href="#">전문관 풀네임 전문관 풀네임</a>
+					<a href="#">&nbsp;</a>
+				</li>
+			</ul>
+		</div>
+		<!-- //올리브영 전문관 2016-12-07 end -->
+		<!-- //올리브영 전문관 2016-12-22 수정 -->
+
+		<!-- 최근 본 상품 2016-12-07 상품 마크업 전체 수정 star -->
+		<div class="late-conts">
+			<h2>최근 본 상품</h2>
+			<ul class="mlist3v-goods">
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_02.png" alt="">
+							<span class="soldOut">품절</span></span><!-- //2016-12-22 추가  품절 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+					<button type="button" class="jeem">찜하기</button>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_02.png" alt="">
+							<span class="soldOut">품절</span></span><!-- //2016-12-22 추가  품절 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+					<button type="button" class="jeem">찜하기</button>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_02.png" alt="">
+							<span class="soldOut">품절</span></span><!-- //2016-12-22 추가  품절 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+					<button type="button" class="jeem">찜하기</button>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_01.png" alt="">
+							<span class="allsoldOut">판매종료</span><!-- //2016-12-22 추가 판매 종료 시 노출// -->
+						</span>
+						<span class="txtus finish"><!--- //2016-12-22 추가 판매종료 시 finish 클래스 추가 // -->
+							<span class="tit">닥터자르트</span>
+							<span class="txt">세라마이딘 마스크</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<img src="/mc-static-root/image/temp/@thum220x220_02.png" alt="">
+							<span class="soldOut">품절</span></span><!-- //2016-12-22 추가  품절 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+					<button type="button" class="jeem">찜하기</button>
+				</li>
+				<li>
+					<a href="#none">
+						<span class="img">
+							<span class="minor">성인인증이 필요합니다.</span><!-- //2016-12-22 추가 성인인증 시 노출// -->
+						</span>
+						<span class="txtus">
+							<span class="tit">키스미</span>
+							<span class="txt">히로인 메이크 롱앤컬 마스카라 S브라운 X키세스콜라</span>
+							<span class="price">
+								<span class="sale">4,000<em>원</em></span>
+								<span class="won">2,000<em>원</em></span>
+							</span>
+							<span class="icon">
+								<span class="plus">1+1</span>
+								<span class="coupon">쿠폰</span>
+								<span class="gift">증정</span>
+								<span class="free">무배</span>
+							</span>
+						</span>
+					</a>
+				</li>
+			</ul>
+			<a class="btnMore" href="#">상품 더보기</a>
+		</div>
+		<!-- //최근 본 상품 상품 마크업 전체 수정 end -->
+
+		<!--  star -->
+		<!-- // end -->
+	</div>
+	<button type="button" class="allmenuClose">전체 메뉴 닫기</button>
+</div>
+<div class="dim" style="z-index:15"></div>
+<!--//전체메뉴 끝-->
+<script type="text/javascript">
+//<![CDATA[
+$(document).ready(function(){
+	//드로어 메뉴 기본 동작 @common.js
+	$("#footerTabCategoy").click(function() {
+		$(".allmenuClose").click(function() {
+			// 타이틀영역 숨기기
+			$("#titConts").show();
+
+			var scollH = $(".allmenu div").scrollTop();
+			if (scollH > 0) {
+				$(".allmenu div").scrollTop(0.0)
+			}
+			$(".allmenu").stop().animate({
+				left : '-100%'
+			}, 200).delay(2000).parents("body").css({
+				"overflow" : "visible"
+			});
+			setTimeout(function() {
+				$(".allmenu").removeClass("show");
+			}, 150);
+
+			$(".dim").hide();
+
+			// 웹 접근성 popfocus 삭제 ( 2017-05-11 )
+			$("a[data-focus~=on]").focus(); // 표시해둔 곳으로 초점 이동
+			window.setTimeout(function() {
+				$("a[data-focus~=on]").removeAttr("data-focus");
+			}, 100); // 
+
+			// 앱 호출
+			setTimeout(function() {
+				// common.app.callMenu("N");
+			}, 100);
+		});
+		
+		// 타이틀영역 숨기기
+		$("#titConts").hide();
+
+		var num = $(".allmenu").hasClass("show");
+
+		if (!num) {
+			// common.setLazyLoad();
+			$(".allmenu").addClass("show").stop().animate({
+				left : 0
+			}, 240).parents("body").css({
+				"overflow" : "hidden"
+			});
+			$(".dim").show();
+			// 앱 호출
+			// setTimeout(function() {
+			//	 common.app.callMenu("Y");
+			// }, 100);
+
+			// if (common.app.appInfo.isapp) {
+			// 	// 앱일 경우 새로운 푸시 있는지 확인하는 스킴 호출
+			// 	location.href = "oliveyoungapp://getpushnewmsgyn";
+			// }
+		} else {
+			$(".allmenu").removeClass("show").stop().animate({
+				left : '-85%'
+			}, 200).parents("body").css({
+				"overflow" : "visible"
+			});
+			$(".dim").hide();
+			// 앱 호출
+			// setTimeout(function() {
+			// 	common.app.callMenu("N");
+			// }, 100);
+		}
+		
+		// setTimeout(function() {
+		// 	common.gnb.bindSlideMenu();
+		// }, 200);
+		
+		// //최근 본 상품
+		// setTimeout(function() {
+		// 	try {
+		// 		common.recentGoods.init();
+		// 	} catch (e) {
+		// 	}
+		// }, 300);
+	});
+});
+//]]>
+</script>
+
+
+
+<!-- popLayerWrap -->
+<div class="popLayerWrap typeUi" id="touchLogin"><!-- //id값 임의, display:none; default 지정// -->
+	<!-- popLayerArea -->
+	<div class="popLayerArea">
+		<!-- popInner -->
+		<div class="popInner">
+			<!-- popContainer -->
+			<div class="popContainer">
+				<!-- popCont 스크롤 영역 -->
+				<div class="popCont">
+					<div class="alertUi">
+						<h2 class="tit">안내</h2>
+						<p class="txt_base">다음 로그인 시 Touch ID 로그인을 <br>사용하시겠습니까?</p>
+						<p class="txt_check"><input type="checkbox" id="noAgain"><label for="noAgain">다시보지 않기</label></p>
+						<ul class="btn_type2">
+							<li><button type="button" onclick="popLayerClose('touchLogin');return false;">아니오</button></li>
+							<li><button type="button" onclick="setTouch();return false;">예</button></li>
+						</ul>
+					</div>
+				</div>
+				<!-- //popCont 스크롤 영역 -->
+			</div>
+			<!-- //popContainer -->
+		</div>
+		<!-- //popInner -->
+	</div>
+	<!-- //popLayerArea -->
+</div>
+<!-- //popLayerWrap -->
+
+<div class="txt_fixed" id="txt_fixed">
+	<div class="inner">
+		<p class="txt">올리브영 계정으로 Touch ID 로그인이 활성화 되었습니다.</p>
+	</div>
+</div>
+
+<div class="dim"></div>
+
+
+
+
+</body>
+</html>
